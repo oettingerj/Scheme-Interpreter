@@ -16,8 +16,8 @@ int main() {
    head = cons(val1, head);
    head = cons(val2, head);
 
-   //display(head);
-   //printf("Length = %i\n", length(head));
-   //printf("Empty? %i\n", isNull(head));
+   display(head);
+   printf("Length = %i\n", length(head));
+   printf("Empty? %i\n", isNull(head));
    cleanup(head);
 }
