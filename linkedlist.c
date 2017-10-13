@@ -48,6 +48,10 @@ Value *cdr(Value *list) {
  * (Uses assertions to ensure that this is a legitimate operation.)
  */
 bool isNull(Value *value) {
+	if ((*value).type == NULL_TYPE){
+		return false;
+	}
+	return true;
 }
 
 /*
