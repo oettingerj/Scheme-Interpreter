@@ -150,4 +150,5 @@ void cleanup(Value *list) {
 		free(old);
 		current = next;
 	}
+	free(current);
 }
