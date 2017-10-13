@@ -74,6 +74,8 @@ int length(Value *value) {
  *      be after we've got an easier way of managing memory.
  */
 Value *reverse(Value *list) {
+	assert((*list).type==CONS_TYPE);
+	return cons(reverse(cdr(list)), car(list));
 }
 
 /*
@@ -85,5 +87,5 @@ Value *reverse(Value *list) {
  * ANS: There won't be for this assignment. There will be later, but that will
  *      be after we've got an easier way of managing memory.
 */
-void cleanup(Value *list) {
+void cleanup(Value *list){
 }
