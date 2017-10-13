@@ -40,7 +40,6 @@ Value *car(Value *list) {
 Value *cdr(Value *list) {
 	assert((*list).type == CONS_TYPE);
         return (*list).c.cdr;
-
 }
 
 /*
@@ -58,7 +57,7 @@ bool isNull(Value *value) {
  * Compute the length of the given list.
  * (Uses assertions to ensure that this is a legitimate operation.)
  */
-int length(Value *value) {
+int length(Value *value) {;
 }
 
 /*
