@@ -21,6 +21,7 @@ Value *cons(Value *car, Value *cdr) {
  * Print a representation of the contents of a linked list.
  */
 void display(Value *list) {
+    
 }
 
 /*
@@ -49,6 +50,15 @@ bool isNull(Value *value) {
  * (Uses assertions to ensure that this is a legitimate operation.)
  */
 int length(Value *value) {
+     int count = 0;
+        assert( value.type == CONS_TYPE );
+        Value *cur = value;
+        while ((isNull(cur){
+                count++;
+            cur = cur->c.cdr;
+            }
+    return count;
+    
 }
 
 /*
