@@ -3,39 +3,29 @@ Right now, just function declarations with no code so we can build it.
 */
 
 #include <stdbool.h>
+#include <stdlib.h>
+#include <stdio.h>
 #include "value.h"
+#include <assert.h>
 
 /*
  * Create an empty list (a new Value object of type NULL_TYPE).
  */
 Value *makeNull() {
+	Value *val = malloc(sizeof(Value));
+	val->type = NULL_TYPE;
+	return val;
 }
 
 /*
  * Create a nonempty list (a new Value object of type CONS_TYPE).
  */
 Value *cons(Value *car, Value *cdr) {
-}
-
-/*
- * Print a representation of the contents of a linked list.
- */
-void display(Value *list) {
-    
-}
-
-/*
- * Get the car value of a given list.
- * (Uses assertions to ensure that this is a legitimate operation.)
- */
-Value *car(Value *list) {
-}
-
-/*
- * Get the cdr value of a given list.
- * (Uses assertions to ensure that this is a legitimate operation.)
- */
-Value *cdr(Value *list) {
+	Value *consVal = malloc(sizeof(Value));
+  consVal->type = CONS_TYPE;
+  consVal->c.car = car;
+  consVal->c.cdr = cdr;
+  return consVal;
 }
 
 /*
@@ -43,6 +33,63 @@ Value *cdr(Value *list) {
  * (Uses assertions to ensure that this is a legitimate operation.)
  */
 bool isNull(Value *value) {
+	if (value->type == NULL_TYPE){
+		return true;
+	}
+	return false;
+}
+
+/*
+ * Print a representation of the contents of a linked list.
+ */
+void display(Value *list) {
+<<<<<<< HEAD
+    
+=======
+	printf("[");
+  Value *current = list;
+  while(!isNull(current)){
+    switch(current->c.car->type){
+      case INT_TYPE:
+        printf("%i", current->c.car->i);
+        break;
+      case DOUBLE_TYPE:
+        printf("%f", current->c.car->d);
+        break;
+      case STR_TYPE:
+        printf("%s", current->c.car->s);
+				break;
+      default:
+        printf("");
+    }
+
+		if(!isNull(current->c.cdr)){
+			printf(", ");
+		}
+
+    current = current->c.cdr;
+  }
+  printf("]\n");
+>>>>>>> 254944c14ef2e723d15943df8dbe200c48145442
+}
+
+/*
+ * Get the car value of a given list.
+ * (Uses assertions to ensure that this is a legitimate operation.)
+ */
+Value *car(Value *list) {
+	assert(list->type == CONS_TYPE);
+	return list->c.car;
+}
+
+/*
+ * Get the cdr value of a given list.
+ * (Uses assertions to ensure that this is a legitimate operation.)
+ */
+Value *cdr(Value *list) {
+	assert(list->type == CONS_TYPE);
+  return list->c.cdr;
+
 }
 
 /*
@@ -50,6 +97,7 @@ bool isNull(Value *value) {
  * (Uses assertions to ensure that this is a legitimate operation.)
  */
 int length(Value *value) {
+<<<<<<< HEAD
      int count = 0;
         assert( value.type == CONS_TYPE );
         Value *cur = value;
@@ -59,6 +107,16 @@ int length(Value *value) {
             }
     return count;
     
+=======
+	int count = 0;
+	assert(value->type == CONS_TYPE);
+	Value *cur = value;
+	while(!isNull(cur)){
+		count++;
+		cur = cur->c.cdr;
+	}
+	return count;
+>>>>>>> 254944c14ef2e723d15943df8dbe200c48145442
 }
 
 /*
@@ -74,6 +132,20 @@ int length(Value *value) {
  *      be after we've got an easier way of managing memory.
  */
 Value *reverse(Value *list) {
+	assert(list->type == CONS_TYPE);
+	Value *prev = makeNull();
+	Value *curr = list;
+	Value *reversed;
+	while(!isNull(curr)){
+		Value *val = malloc(sizeof(Value));
+		val->type = curr->type;
+		val->c.car = curr->c.car;
+		val->c.cdr = prev;
+		prev = val;
+		curr = curr->c.cdr;
+		reversed = val;
+	}
+	return reversed;
 }
 
 /*
@@ -86,4 +158,13 @@ Value *reverse(Value *list) {
  *      be after we've got an easier way of managing memory.
 */
 void cleanup(Value *list) {
+	Value *current = list;
+	while(!isNull(current)){
+		Value *next = current->c.cdr;
+		free(current->c.car);
+		Value *old = current;
+		free(old);
+		current = next;
+	}
+	free(current);
 }
