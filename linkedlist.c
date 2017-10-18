@@ -7,12 +7,13 @@ Right now, just function declarations with no code so we can build it.
 #include <stdio.h>
 #include "value.h"
 #include <assert.h>
+#include "talloc.h"
 
 /*
  * Create an empty list (a new Value object of type NULL_TYPE).
  */
 Value *makeNull() {
-	Value *val = malloc(sizeof(Value));
+	Value *val = talloc(sizeof(Value));
 	val->type = NULL_TYPE;
 	return val;
 }
@@ -21,7 +22,7 @@ Value *makeNull() {
  * Create a nonempty list (a new Value object of type CONS_TYPE).
  */
 Value *cons(Value *car, Value *cdr) {
-	Value *consVal = malloc(sizeof(Value));
+	Value *consVal = talloc(sizeof(Value));
   consVal->type = CONS_TYPE;
   consVal->c.car = car;
   consVal->c.cdr = cdr;
@@ -55,6 +56,9 @@ void display(Value *list) {
         break;
       case STR_TYPE:
         printf("%s", current->c.car->s);
+				break;
+			case PTR_TYPE:
+				printf("%p", current->c.car->p);
 				break;
       default:
         printf("");
@@ -120,7 +124,7 @@ Value *reverse(Value *list) {
 	Value *curr = list;
 	Value *reversed;
 	while(!isNull(curr)){
-		Value *val = malloc(sizeof(Value));
+		Value *val = talloc(sizeof(Value));
 		val->type = curr->type;
 		val->c.car = curr->c.car;
 		val->c.cdr = prev;
