@@ -80,12 +80,7 @@ Value *car(Value *list) {
  */
 Value *cdr(Value *list) {
 	assert((*list).type == CONS_TYPE);
-<<<<<<< HEAD
         return (*list).c.cdr;
-=======
-  return (*list).c.cdr;
-
->>>>>>> 8d2bee840d4adc6ed91de784d0556e83a2c6548a
 }
 
 /*
