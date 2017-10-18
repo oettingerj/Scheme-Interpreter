@@ -1,5 +1,6 @@
 /*
 Tracked malloc: a rudimentary garbage collector for C
+Authors: Josh Oettinger, Nathaniel Lovin, Tenzin Dolphen
 */
 
 #include <stdlib.h>

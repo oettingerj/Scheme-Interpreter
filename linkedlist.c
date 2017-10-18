@@ -1,5 +1,6 @@
 /*
 C implementation of a linked list
+Authors: Josh Oettinger, Nathaniel Lovin, Tenzin Dolphen
 */
 
 #include <stdbool.h>
