@@ -43,9 +43,12 @@ bool isNull(Value *value) {
  * Print a representation of the contents of a linked list.
  */
 void display(Value *list) {
+<<<<<<< HEAD
+    
+=======
 	printf("[");
   Value *current = list;
-  while(!isNull(current->c.car)){
+  while(!isNull(current)){
     switch(current->c.car->type){
       case INT_TYPE:
         printf("%i", current->c.car->i);
@@ -59,10 +62,15 @@ void display(Value *list) {
       default:
         printf("");
     }
-    printf(", ");
+
+		if(!isNull(current->c.cdr)){
+			printf(", ");
+		}
+
     current = current->c.cdr;
   }
-  printf("]");
+  printf("]\n");
+>>>>>>> 254944c14ef2e723d15943df8dbe200c48145442
 }
 
 /*
@@ -70,8 +78,8 @@ void display(Value *list) {
  * (Uses assertions to ensure that this is a legitimate operation.)
  */
 Value *car(Value *list) {
-	assert((*list).type == CONS_TYPE);
-	return (*list).c.car;
+	assert(list->type == CONS_TYPE);
+	return list->c.car;
 }
 
 /*
@@ -79,15 +87,45 @@ Value *car(Value *list) {
  * (Uses assertions to ensure that this is a legitimate operation.)
  */
 Value *cdr(Value *list) {
+<<<<<<< HEAD
 	assert((*list).type == CONS_TYPE);
         return (*list).c.cdr;
+=======
+	assert(list->type == CONS_TYPE);
+  return list->c.cdr;
+
+>>>>>>> 10daa6421bc6f735cc952d69c9e2d9e6b7bceec9
 }
 
 /*
  * Compute the length of the given list.
  * (Uses assertions to ensure that this is a legitimate operation.)
  */
+<<<<<<< HEAD
 int length(Value *value) {;
+=======
+int length(Value *value) {
+<<<<<<< HEAD
+     int count = 0;
+        assert( value.type == CONS_TYPE );
+        Value *cur = value;
+        while ((isNull(cur){
+                count++;
+            cur = cur->c.cdr;
+            }
+    return count;
+    
+=======
+	int count = 0;
+	assert(value->type == CONS_TYPE);
+	Value *cur = value;
+	while(!isNull(cur)){
+		count++;
+		cur = cur->c.cdr;
+	}
+	return count;
+>>>>>>> 254944c14ef2e723d15943df8dbe200c48145442
+>>>>>>> 10daa6421bc6f735cc952d69c9e2d9e6b7bceec9
 }
 
 /*
@@ -103,8 +141,20 @@ int length(Value *value) {;
  *      be after we've got an easier way of managing memory.
  */
 Value *reverse(Value *list) {
-	assert((*list).type==CONS_TYPE);
-	return cons(reverse(cdr(list)), car(list));
+	assert(list->type == CONS_TYPE);
+	Value *prev = makeNull();
+	Value *curr = list;
+	Value *reversed;
+	while(!isNull(curr)){
+		Value *val = malloc(sizeof(Value));
+		val->type = curr->type;
+		val->c.car = curr->c.car;
+		val->c.cdr = prev;
+		prev = val;
+		curr = curr->c.cdr;
+		reversed = val;
+	}
+	return reversed;
 }
 
 /*
@@ -118,12 +168,12 @@ Value *reverse(Value *list) {
 */
 void cleanup(Value *list) {
 	Value *current = list;
-	while(!isNull(current->c.car)){
+	while(!isNull(current)){
 		Value *next = current->c.cdr;
 		free(current->c.car);
-		free(current->c.cdr);
 		Value *old = current;
-		current = next;
 		free(old);
+		current = next;
 	}
+	free(current);
 }
