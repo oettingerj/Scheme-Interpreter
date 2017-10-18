@@ -1,4 +1,5 @@
 /*
+Tracked malloc: a rudimentary garbage collector for C
 */
 
 #include <stdlib.h>
@@ -18,25 +19,27 @@ bool isMalloc;
  * modify the linked list to use talloc instead of malloc.)
  */
 void *talloc(size_t size) {
+	//If active list has not been malloc'd, malloc and make list null
 	if(isMalloc != true){
 		allocated = malloc(sizeof(Value));
 		allocated->type = NULL_TYPE;
 		isMalloc = true;
 	}
 
+	//Allocate new cons Value
 	Value *consVal = malloc(sizeof(Value));
   consVal->type = CONS_TYPE;
 
+	//Allocate new pointer Value to store pointer to malloc'd memory
 	Value *val = malloc(sizeof(Value));
 	val->type = PTR_TYPE;
 	void *pointer = malloc(size);
 	val->p = pointer;
 
+	//Cons new value to active list
   consVal->c.car = val;
   consVal->c.cdr = allocated;
 	allocated = consVal;
-
-	display(allocated);
 
 	return pointer;
 }

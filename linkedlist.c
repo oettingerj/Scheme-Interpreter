@@ -1,5 +1,5 @@
-/* LinkedList
-Right now, just function declarations with no code so we can build it.
+/*
+C implementation of a linked list
 */
 
 #include <stdbool.h>
