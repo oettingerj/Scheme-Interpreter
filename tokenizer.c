@@ -31,8 +31,11 @@ Value *tokenize(){
         val->type = CLOSE_TYPE;
         val->s = ")";
         list = cons(val, list);
-      } /*else if (charRead == ...) {
-      }*/
+      } else if (charRead == '#') {
+	/*create a string, add to it until space
+	  which is also what we'll do for strings and
+          symbols*/ 
+      }
 	else {
          printf(".");
       }
