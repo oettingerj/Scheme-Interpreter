@@ -14,8 +14,15 @@ void *talloc(size_t size) {
 
 /* Free all pointers allocated by talloc */
 void tfree() {
-/* My first thought for this was to just copy the clean-up code from
-   LinkedList? That might work? */
+	Value *current = allocated;
+	while(!isNull(current)){
+		Value *next = current->c.cdr;
+		free(current->c.car);
+		Value *old = current;
+		free(old);
+		current = next;
+	}
+	free(current);
 }
 
 /* A replacement for exit using tfree*/
