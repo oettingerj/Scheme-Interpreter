@@ -43,9 +43,6 @@ bool isNull(Value *value) {
  * Print a representation of the contents of a linked list.
  */
 void display(Value *list) {
-<<<<<<< HEAD
-    
-=======
 	printf("[");
   Value *current = list;
   while(!isNull(current)){
@@ -70,7 +67,6 @@ void display(Value *list) {
     current = current->c.cdr;
   }
   printf("]\n");
->>>>>>> 254944c14ef2e723d15943df8dbe200c48145442
 }
 
 /*
@@ -87,35 +83,15 @@ Value *car(Value *list) {
  * (Uses assertions to ensure that this is a legitimate operation.)
  */
 Value *cdr(Value *list) {
-<<<<<<< HEAD
-	assert((*list).type == CONS_TYPE);
-        return (*list).c.cdr;
-=======
 	assert(list->type == CONS_TYPE);
   return list->c.cdr;
-
->>>>>>> 10daa6421bc6f735cc952d69c9e2d9e6b7bceec9
 }
 
 /*
  * Compute the length of the given list.
  * (Uses assertions to ensure that this is a legitimate operation.)
  */
-<<<<<<< HEAD
-int length(Value *value) {;
-=======
 int length(Value *value) {
-<<<<<<< HEAD
-     int count = 0;
-        assert( value.type == CONS_TYPE );
-        Value *cur = value;
-        while ((isNull(cur){
-                count++;
-            cur = cur->c.cdr;
-            }
-    return count;
-    
-=======
 	int count = 0;
 	assert(value->type == CONS_TYPE);
 	Value *cur = value;
@@ -124,8 +100,6 @@ int length(Value *value) {
 		cur = cur->c.cdr;
 	}
 	return count;
->>>>>>> 254944c14ef2e723d15943df8dbe200c48145442
->>>>>>> 10daa6421bc6f735cc952d69c9e2d9e6b7bceec9
 }
 
 /*
