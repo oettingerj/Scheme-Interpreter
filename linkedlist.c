@@ -104,8 +104,8 @@ int length(Value *value) {
 
 /*
  * Create a new linked list whose entries correspond to the given list's
- * entries, but in reverse order.  The resulting list is a deep copy of the
- * original: that is, there should be no shared memory between the original
+ * entries, but in reverse order.  The resulting list is not a deep copy of the
+ * original: that is, there will be shared memory between the original
  * list and the new one.
  *
  * (Uses assertions to ensure that this is a legitimate operation.)
@@ -129,25 +129,4 @@ Value *reverse(Value *list) {
 		reversed = val;
 	}
 	return reversed;
-}
-
-/*
- * Frees up all memory directly or indirectly referred to by list.
- *
- * (Uses assertions to ensure that this is a legitimate operation.)
- *
- * FAQ: What if there are nested lists inside that list?
- * ANS: There won't be for this assignment. There will be later, but that will
- *      be after we've got an easier way of managing memory.
-*/
-void cleanup(Value *list) {
-	Value *current = list;
-	while(!isNull(current)){
-		Value *next = current->c.cdr;
-		free(current->c.car);
-		Value *old = current;
-		free(old);
-		current = next;
-	}
-	free(current);
 }
