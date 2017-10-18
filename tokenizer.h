@@ -2,7 +2,7 @@
 Header file for tokenizer
 */
 
-#include <stdin.h>
+#include <stdio.h>
 #include "value.h"
 #include "talloc.h"
 #include "linkedlist.h"

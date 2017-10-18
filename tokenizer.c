@@ -16,15 +16,31 @@ Value *tokenize(){
    char charRead;
    Value *list = makeNull();
    charRead = fgetc(stdin);
+   /*Ignore rest of line if comment*/
+   if(charRead == ';'){
+     charRead = EOF;
+   }
    while (charRead != EOF) {
-      if (charRead == ) {
-         ...
-      } else if (charRead == ...) {
-         ...
-      } else {
-         ...
+      if (charRead == '(' ) {
+        Value *val = talloc(sizeof(Value));
+	val->type = OPEN_TYPE;
+	val->s = "(";
+	list = cons(val, list);
+      } else if (charRead == ')') {
+        Value *val = talloc(sizeof(Value));
+        val->type = CLOSE_TYPE;
+        val->s = ")";
+        list = cons(val, list);
+      } /*else if (charRead == ...) {
+      }*/
+	else {
+         printf(".");
       }
       charRead = fgetc(stdin);
+      /*There's probably a better way to do this*/
+      if(charRead == ';'){
+	charRead = EOF;
+      }
    }
    return reverse(list);
 }
