@@ -56,7 +56,7 @@ void display(Value *list) {
         printf("%f", current->c.car->d);
         break;
       case STR_TYPE:
-        printf("%s", current->c.car->s);
+        printf("\"%s\"", current->c.car->s);
 				break;
 			case PTR_TYPE:
 				printf("%p", current->c.car->p);
@@ -78,7 +78,8 @@ void display(Value *list) {
  * Get the car value of a given list.
  * (Uses assertions to ensure that this is a legitimate operation.)
  */
-Value *car(Value *list) {
+Value *car(Value *list){
+	assert(list != NULL);
 	assert(list->type == CONS_TYPE);
 	return list->c.car;
 }
@@ -88,6 +89,7 @@ Value *car(Value *list) {
  * (Uses assertions to ensure that this is a legitimate operation.)
  */
 Value *cdr(Value *list) {
+	assert(list != NULL);
 	assert(list->type == CONS_TYPE);
   return list->c.cdr;
 }
@@ -98,6 +100,7 @@ Value *cdr(Value *list) {
  */
 int length(Value *value) {
 	int count = 0;
+	assert(value != NULL);
 	assert(value->type == CONS_TYPE);
 	Value *cur = value;
 	while(!isNull(cur)){
@@ -120,18 +123,23 @@ int length(Value *value) {
  *      be after we've got an easier way of managing memory.
  */
 Value *reverse(Value *list) {
-	assert(list->type == CONS_TYPE);
-	Value *prev = makeNull();
-	Value *curr = list;
-	Value *reversed;
-	while(!isNull(curr)){
-		Value *val = talloc(sizeof(Value));
-		val->type = curr->type;
-		val->c.car = curr->c.car;
-		val->c.cdr = prev;
-		prev = val;
-		curr = curr->c.cdr;
-		reversed = val;
+	assert(list != NULL);
+	if(list->type == NULL_TYPE){
+		return makeNull();
+	} else{
+		assert(list->type == CONS_TYPE);
+		Value *prev = makeNull();
+		Value *curr = list;
+		Value *reversed;
+		while(!isNull(curr)){
+			Value *val = talloc(sizeof(Value));
+			val->type = curr->type;
+			val->c.car = curr->c.car;
+			val->c.cdr = prev;
+			prev = val;
+			curr = curr->c.cdr;
+			reversed = val;
+		}
+		return reversed;
 	}
-	return reversed;
 }
