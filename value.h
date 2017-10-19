@@ -7,7 +7,11 @@ typedef enum {
    DOUBLE_TYPE,
    STR_TYPE,
    CONS_TYPE,
-   NULL_TYPE
+   NULL_TYPE,
+   BOOL_TYPE,
+   OPEN_TYPE,
+   CLOSE_TYPE,
+   SYMBOL_TYPE
 } valueType;
 
 struct Value {
