@@ -6,6 +6,7 @@ Methods to break input into tokens and assign types
 #include "value.h"
 #include "talloc.h"
 #include "linkedlist.h"
+#include <ctype.h>
 
 /*There's probably going to be a bunch of helper methods here
 */
@@ -35,8 +36,27 @@ Value *tokenize(){
 	/*create a string, add to it until space
 	  which is also what we'll do for strings and
           symbols*/ 
-      }
+      } else if (charRead == '"') {
+	
+	Value *val = talloc(sizeof(Value));
+	val->type = STR_TYPE;
+	val->s = "\"";
+	list = cons(val, list);
+      } else if(charRead == '+') {
+        charRead = fgetc(stdin);
+	if(charRead == ' '){
+		Value *val = talloc(sizeof(Value));
+		val->type = SYMBOL_TYPE;
+		val->s = "+";
+		list = cons(val, list);
+	}
+	else if (isdigit(charRead)){
+	}
 	else {
+		printf("invalid");
+		texit(1);
+	}
+      } else {
          printf(".");
       }
       charRead = fgetc(stdin);
