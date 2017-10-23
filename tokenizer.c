@@ -94,12 +94,10 @@ Value *tokenize(){
       if (charRead == 't'){
         val->type = BOOL_TYPE;
         val->s = "#t";
-        list = cons(val, list);
       }
       else if (charRead == 'f'){
         val->type = BOOL_TYPE;
         val->s = "#f";
-        list = cons(val, list);
       }
       else {
         printf("invalid\n");
@@ -107,7 +105,8 @@ Value *tokenize(){
       }
     } else if (charRead == '"') {
       //Strings
-      char str[256] = "\"";
+      char *str = talloc(sizeof(char)*256);
+      str[0] = '"';
       int strLen = 1;
       charRead = fgetc(stdin);
       while(charRead != '"'){
@@ -144,15 +143,18 @@ Value *tokenize(){
         charRead = fgetc(stdin);
       }
       str[strLen] = '"';
+      strLen++;
+      str[strLen] = 0;
       val->type = STR_TYPE;
       val->s = str;
     } else if(charRead == '+' || charRead == '-') {
-      char nstr[256] = "";
+      char *nstr = talloc(sizeof(char)*256);
       int nstrLen = 0;
       nstr[nstrLen] = charRead;
       nstrLen++;
       charRead = fgetc(stdin);
       if(charRead == ' '){
+        nstr[nstrLen] = 0;
         val->type = SYMBOL_TYPE;
         val->s = nstr;
       } else{
@@ -194,7 +196,7 @@ Value *tokenize(){
         }
       }
     } else if(charRead == '.'){
-      char dstr[256] = "";
+      char *dstr = talloc(sizeof(char)*256);
       int dstrLen = 0;
       dstr[dstrLen] = charRead;
       dstrLen++;
@@ -222,7 +224,7 @@ Value *tokenize(){
         texit(1);
       }
     } else if(isdigit(charRead)){
-      char istr[256] = "";
+      char *istr = talloc(sizeof(char)*256);
       int istrLen = 0;
       bool noDot = true;
       while(isdigit(charRead) || (charRead == '.' && noDot == true)){
@@ -261,7 +263,7 @@ Value *tokenize(){
         texit(1);
       }
     } else if(charRead != ' '){
-      char sstr[256] = "";
+      char *sstr = talloc(sizeof(char)*256);
       int sstrLen = 0;
       if(canStartSymbol(charRead)){
         while(canFinishSymbol(charRead)){
@@ -269,6 +271,7 @@ Value *tokenize(){
           sstrLen++;
           charRead = fgetc(stdin);
         }
+        sstr[sstrLen] = 0;
         val->type = SYMBOL_TYPE;
         val->s = sstr;
         ungetc(charRead, stdin);
@@ -284,8 +287,6 @@ Value *tokenize(){
       charRead = EOF;
     }
   }
-  printf("");
-  printf("");
   return reverse(list);
 }
 
@@ -297,6 +298,7 @@ void displayTokens(Value *list) {
     switch(current->c.car->type){
       case BOOL_TYPE:
         printf("%s:boolean\n", current->c.car->s);
+        break;
       case INT_TYPE:
         printf("%i:integer\n", current->c.car->i);
       break;
