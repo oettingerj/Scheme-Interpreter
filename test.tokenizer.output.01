@@ -13,6 +13,7 @@ quote:symbol
 ):close
 ):close
 (:open
+-:symbol
 $alphanum:symbol
 a8+9:symbol
 ):close
