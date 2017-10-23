@@ -7,6 +7,8 @@ Methods to break input into tokens and assign types
 #include "talloc.h"
 #include "linkedlist.h"
 #include <ctype.h>
+#include <stdbool.h>
+#include <stdlib.h>
 
 /*There's probably going to be a bunch of helper methods here
 */
@@ -92,17 +94,17 @@ Value *tokenize(){
       char str[256] = "";
       int strLen = 0;
       str[strLen] = charRead;
-      strlen++;
+      strLen++;
       charRead = fgetc(stdin);
       if(charRead == ' '){
         val->type = SYMBOL_TYPE;
         val->s = str;
       }
       bool noDot = true;
-      while(isdigit(charRead) || (charRead == "." && noDot = true)){
+      while(isdigit(charRead) || (charRead == '.' && noDot == true)){
         str[strLen] = charRead;
         strLen++;
-	if(charRead == "."){
+	if(charRead == '.'){
 		noDot = false;
 	}
 	charRead = fgetc(stdin);
