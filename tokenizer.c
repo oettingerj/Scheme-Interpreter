@@ -67,8 +67,10 @@ bool canFinishSymbol(char c){
   }
 }
 
-/*This is just the code Jed said to use as a starter right now.
-*/
+/*TODO:
+1. Comments should end line, not file
+2. Increase string character limit
+3. Test files*/
 Value *tokenize(){
   char charRead;
   Value *list = makeNull();
