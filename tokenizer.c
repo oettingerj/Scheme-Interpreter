@@ -29,12 +29,10 @@ Value *tokenize(){
       //Open parentheses
       val->type = OPEN_TYPE;
       val->s = "(";
-      list = cons(val, list);
     } else if (charRead == ')') {
       //Close parentheses
       val->type = CLOSE_TYPE;
       val->s = ")";
-      list = cons(val, list);
     } else if (charRead == '#') {
         charRead = fgetc(stdin);
         if (charRead == 't'){
@@ -51,9 +49,6 @@ Value *tokenize(){
             printf("invalid");
             texit(1);
         }
-        /*create a string, add to it until space
-         which is also what we'll do for strings and
-         symbols*/
     } else if (charRead == '"') {
       //Strings
       char str[256] = "";
@@ -93,16 +88,36 @@ Value *tokenize(){
       }
       val->type = STR_TYPE;
       val->s = str;
-      list = cons(val, list);
-    } else if(charRead == '+') {
+    } else if(charRead == '+' || charRead == '-') {
+      char str[256] = "";
+      int strLen = 0;
+      str[strLen] = charRead;
+      strlen++;
       charRead = fgetc(stdin);
       if(charRead == ' '){
         val->type = SYMBOL_TYPE;
-        val->s = "+";
-        list = cons(val, list);
+        val->s = str;
       }
-      else if (isdigit(charRead)){
-        //Number
+      bool noDot = true;
+      while(isdigit(charRead) || (charRead == "." && noDot = true)){
+        str[strLen] = charRead;
+        strLen++;
+	if(charRead == "."){
+		noDot = false;
+	}
+	charRead = fgetc(stdin);
+      }
+      if (charRead==' '){
+	if(noDot){
+		int x = atoi(str);
+		val->type = INT_TYPE;
+		val->i = x;
+	}
+	else {
+		float x = atof(str);
+		val->type = DOUBLE_TYPE;
+		val->d = x;
+	}
       }
       else {
         printf("invalid");
@@ -111,6 +126,7 @@ Value *tokenize(){
     } else {
       printf(".");
     }
+    list = cons(val, list);
     charRead = fgetc(stdin);
     /*There's probably a better way to do this*/
     if(charRead == ';'){
