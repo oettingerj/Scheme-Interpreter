@@ -147,19 +147,19 @@ Value *tokenize(){
       val->type = STR_TYPE;
       val->s = str;
     } else if(charRead == '+' || charRead == '-') {
-      char str[256] = "";
-      int strLen = 0;
-      str[strLen] = charRead;
-      strLen++;
+      char nstr[256] = "";
+      int nstrLen = 0;
+      nstr[nstrLen] = charRead;
+      nstrLen++;
       charRead = fgetc(stdin);
       if(charRead == ' '){
         val->type = SYMBOL_TYPE;
-        val->s = str;
+        val->s = nstr;
       } else{
         bool noDot = true;
         while(isdigit(charRead) || (charRead == '.' && noDot == true)){
-          str[strLen] = charRead;
-          strLen++;
+          nstr[nstrLen] = charRead;
+          nstrLen++;
           if(charRead == '.'){
             noDot = false;
           }
@@ -167,52 +167,67 @@ Value *tokenize(){
         }
         if (charRead==' '){
           if(noDot){
-            int x = atoi(str);
+            int x = atoi(nstr);
             val->type = INT_TYPE;
             val->i = x;
           }
           else {
-            float x = atof(str);
+            float x = atof(nstr);
             val->type = DOUBLE_TYPE;
             val->d = x;
           }
-        }
-        else {
+        } else if(charRead == ')'){
+          if(noDot){
+            int x = atoi(nstr);
+            val->type = INT_TYPE;
+            val->i = x;
+            ungetc(charRead, stdin);
+          } else {
+            float x = atof(nstr);
+            val->type = DOUBLE_TYPE;
+            val->d = x;
+            ungetc(charRead, stdin);
+          }
+        } else {
           printf("invalid\n");
           texit(1);
         }
       }
     } else if(charRead == '.'){
-      char str[256] = "";
-      int strLen = 0;
-      str[strLen] = charRead;
-      strLen++;
+      char dstr[256] = "";
+      int dstrLen = 0;
+      dstr[dstrLen] = charRead;
+      dstrLen++;
       charRead = fgetc(stdin);
       if(!isdigit(charRead)){
         printf("invalid\n");
         texit(1);
       }
       while(isdigit(charRead)){
-        str[strLen] = charRead;
-        strLen++;
+        dstr[dstrLen] = charRead;
+        dstrLen++;
         charRead = fgetc(stdin);
       }
       if(charRead == ' '){
-        float x = atof(str);
+        float x = atof(dstr);
         val->type = DOUBLE_TYPE;
         val->d = x;
-      }
-      else {
+      } else if(charRead == ')'){
+        float x = atof(dstr);
+        val->type = DOUBLE_TYPE;
+        val->d = x;
+        ungetc(charRead, stdin);
+      } else {
         printf("invalid\n");
         texit(1);
       }
     } else if(isdigit(charRead)){
-      char str[256] = "";
-      int strLen = 0;
+      char istr[256] = "";
+      int istrLen = 0;
       bool noDot = true;
       while(isdigit(charRead) || (charRead == '.' && noDot == true)){
-        str[strLen] = charRead;
-        strLen++;
+        istr[istrLen] = charRead;
+        istrLen++;
         if(charRead == '.'){
           noDot = false;
         }
@@ -220,23 +235,23 @@ Value *tokenize(){
       }
       if (charRead == ' '){
         if(noDot){
-          int x = atoi(str);
+          int x = atoi(istr);
           val->type = INT_TYPE;
           val->i = x;
         }
         else {
-          float x = atof(str);
+          float x = atof(istr);
           val->type = DOUBLE_TYPE;
           val->d = x;
         }
       } else if(charRead == ')'){
         if(noDot){
-          int x = atoi(str);
+          int x = atoi(istr);
           val->type = INT_TYPE;
           val->i = x;
           ungetc(charRead, stdin);
         } else {
-          float x = atof(str);
+          float x = atof(istr);
           val->type = DOUBLE_TYPE;
           val->d = x;
           ungetc(charRead, stdin);
@@ -246,16 +261,16 @@ Value *tokenize(){
         texit(1);
       }
     } else if(charRead != ' '){
-      char str[256] = "";
-      int strLen = 0;
+      char sstr[256] = "";
+      int sstrLen = 0;
       if(canStartSymbol(charRead)){
         while(canFinishSymbol(charRead)){
-          str[strLen] = charRead;
-          strLen++;
+          sstr[sstrLen] = charRead;
+          sstrLen++;
           charRead = fgetc(stdin);
         }
         val->type = SYMBOL_TYPE;
-        val->s = str;
+        val->s = sstr;
         ungetc(charRead, stdin);
       }
     }
