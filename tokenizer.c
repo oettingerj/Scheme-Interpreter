@@ -68,17 +68,14 @@ bool canFinishSymbol(char c){
 }
 
 /*TODO:
-1. Comments should end line, not file
-2. Increase string character limit
-3. Test files*/
+1. Increase string character limit
+2. Test files
+3. clean up/style*/
 Value *tokenize(){
   char charRead;
   Value *list = makeNull();
   charRead = fgetc(stdin);
   /*Ignore rest of line if comment*/
-  if(charRead == ';'){
-    charRead = EOF;
-  }
 
   while (charRead != EOF) {
     Value *val = talloc(sizeof(Value));
@@ -169,7 +166,7 @@ Value *tokenize(){
           }
           charRead = fgetc(stdin);
         }
-        if (charRead==' '){
+        if (charRead==' ' || charRead == ')' || charRead == ';'){
           if(noDot){
             int x = atoi(nstr);
             val->type = INT_TYPE;
@@ -180,18 +177,7 @@ Value *tokenize(){
             val->type = DOUBLE_TYPE;
             val->d = x;
           }
-        } else if(charRead == ')'){
-          if(noDot){
-            int x = atoi(nstr);
-            val->type = INT_TYPE;
-            val->i = x;
-            ungetc(charRead, stdin);
-          } else {
-            float x = atof(nstr);
-            val->type = DOUBLE_TYPE;
-            val->d = x;
-            ungetc(charRead, stdin);
-          }
+	ungetc(charRead,stdin);
         } else {
           printf("invalid\n");
           texit(1);
@@ -212,15 +198,11 @@ Value *tokenize(){
         dstrLen++;
         charRead = fgetc(stdin);
       }
-      if(charRead == ' '){
+      if(charRead == ' ' || charRead == ')' || charRead== ';'){
         float x = atof(dstr);
         val->type = DOUBLE_TYPE;
         val->d = x;
-      } else if(charRead == ')'){
-        float x = atof(dstr);
-        val->type = DOUBLE_TYPE;
-        val->d = x;
-        ungetc(charRead, stdin);
+	ungetc(charRead, stdin);
       } else {
         printf("invalid\n");
         texit(1);
@@ -237,7 +219,7 @@ Value *tokenize(){
         }
         charRead = fgetc(stdin);
       }
-      if (charRead == ' '){
+      if (charRead == ' ' || charRead == ';' || charRead == ')'){
         if(noDot){
           int x = atoi(istr);
           val->type = INT_TYPE;
@@ -248,22 +230,15 @@ Value *tokenize(){
           val->type = DOUBLE_TYPE;
           val->d = x;
         }
-      } else if(charRead == ')'){
-        if(noDot){
-          int x = atoi(istr);
-          val->type = INT_TYPE;
-          val->i = x;
-          ungetc(charRead, stdin);
-        } else {
-          float x = atof(istr);
-          val->type = DOUBLE_TYPE;
-          val->d = x;
-          ungetc(charRead, stdin);
-        }
+	ungetc(charRead, stdin);
       } else {
         printf("invalid\n");
         texit(1);
       }
+    } else if(charRead == ';'){
+	while(charRead != '\n'){
+		charRead = fgetc(stdin);
+	}
     } else if(charRead != ' '){
       char *sstr = talloc(sizeof(char)*256);
       int sstrLen = 0;
@@ -284,10 +259,6 @@ Value *tokenize(){
       list = cons(val, list);
     }
     charRead = fgetc(stdin);
-    /*There's probably a better way to do this*/
-    if(charRead == ';'){
-      charRead = EOF;
-    }
   }
   return reverse(list);
 }
