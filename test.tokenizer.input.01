@@ -2,4 +2,7 @@
 		(1 2 3 4))
 	;hello!
 	;many comments in a row
-	$alphanum a8+9)
+	(- $alphanum a8+9)
+	(if #f
+	    2
+	    3))

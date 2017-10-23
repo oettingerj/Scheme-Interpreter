@@ -12,6 +12,14 @@ quote:symbol
 4:integer
 ):close
 ):close
+(:open
 $alphanum:symbol
 a8+9:symbol
+):close
+(:open
+if:symbol
+#f:boolean
+2:integer
+3:integer
+):close
 ):close
