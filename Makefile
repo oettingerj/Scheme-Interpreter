@@ -16,4 +16,4 @@ memtest: tokenizer
 
 clean:
 	rm *.o
-	rm linkedlist
+	rm tokenizer

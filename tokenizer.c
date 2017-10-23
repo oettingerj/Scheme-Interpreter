@@ -22,16 +22,16 @@ Value *tokenize(){
     charRead = EOF;
   }
 
+  Value *val = talloc(sizeof(Value));
+
   while (charRead != EOF) {
     if (charRead == '(' ) {
       //Open parentheses
-      Value *val = talloc(sizeof(Value));
       val->type = OPEN_TYPE;
       val->s = "(";
       list = cons(val, list);
     } else if (charRead == ')') {
       //Close parentheses
-      Value *val = talloc(sizeof(Value));
       val->type = CLOSE_TYPE;
       val->s = ")";
       list = cons(val, list);
@@ -41,20 +41,53 @@ Value *tokenize(){
       symbols*/
     } else if (charRead == '"') {
       //Strings
-      Value *val = talloc(sizeof(Value));
+      char str[256] = "";
+      int strLen = 0;
+      charRead = fgetc(stdin);
+      while(charRead != '"'){
+        if(charRead == '\\'){
+          charRead = fgetc(stdin);
+          switch(charRead){
+            case 'n':
+              str[strLen] = '\n';
+              strLen++;
+              break;
+            case 't':
+              str[strLen] = '\t';
+              strLen++;
+              break;
+            case '\\':
+              str[strLen] = '\\';
+              strLen++;
+              break;
+            case '\'':
+              str[strLen] = '\'';
+              strLen++;
+              break;
+            case '"':
+              str[strLen] = '"';
+              strLen++;
+              break;
+            default:
+              break;
+          }
+        } else{
+          str[strLen] = charRead;
+          strLen++;
+        }
+      }
       val->type = STR_TYPE;
-      val->s = "\"";
+      val->s = str;
       list = cons(val, list);
     } else if(charRead == '+') {
       charRead = fgetc(stdin);
       if(charRead == ' '){
-        Value *val = talloc(sizeof(Value));
         val->type = SYMBOL_TYPE;
         val->s = "+";
         list = cons(val, list);
       }
       else if (isdigit(charRead)){
-        //Numbers
+        //Number
       }
       else {
         printf("invalid");
