@@ -1,0 +1,17 @@
+(:open
++:symbol
+59:integer
+(:open
+quote:symbol
+(:open
+"hello world":string
+(:open
+1:integer
+2:integer
+3:integer
+4:integer
+):close
+):close
+$alphanum:symbol
+a8+9:symbol
+):close
