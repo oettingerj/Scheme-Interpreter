@@ -1,0 +1,19 @@
+(:open
+if:symbol 
+#t:boolean
+(:open
++:symbol
+4:integer
+(:open
++:symbol
+(:open
+quote:symbol
+x:symbol
+):close
+):close
+):close
+x3:symbol
+=:symbol
+"/t;; still /n a string":string
+23:integer
+):close
