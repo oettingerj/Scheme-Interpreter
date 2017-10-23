@@ -125,7 +125,26 @@ Value *tokenize(){
         printf("invalid");
         texit(1);
       }
-    } else {
+    } else if(charRead == '.'){
+      char str[256] = "";
+      int strLen = 0;
+      str[strLen] = charRead;
+      strLen++;
+      while(isdigit(charRead)){
+	str[strLen] = charRead;
+        strLen++;
+	charRead = fgetc(stdin);
+      }
+      if(charRead == ' '){
+	float x = atof(str);
+	val->type = DOUBLE_TYPE;
+	val->d = x;
+      }
+      else {
+        printf("invalid");
+        texit(1);
+      }	
+    }else {
       printf(".");
     }
     list = cons(val, list);
