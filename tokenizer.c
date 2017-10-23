@@ -130,6 +130,11 @@ Value *tokenize(){
       int strLen = 0;
       str[strLen] = charRead;
       strLen++;
+      charRead = fgetc(stdin);
+      if(!isdigit(charRead)){
+	printf("invalid");
+	texit(1);
+      }
       while(isdigit(charRead)){
 	str[strLen] = charRead;
         strLen++;
@@ -144,7 +149,35 @@ Value *tokenize(){
         printf("invalid");
         texit(1);
       }	
-    }else {
+    } else if(isdigit(charRead)){
+      char str[256] = "";
+      int strLen = 0;
+      bool noDot = true;
+      while(isdigit(charRead) || (charRead == '.' && noDot == true)){
+        str[strLen] = charRead;
+        strLen++;
+	if(charRead == '.'){
+		noDot = false;
+	}
+	charRead = fgetc(stdin);
+      }
+      if (charRead==' '){
+	if(noDot){
+		int x = atoi(str);
+		val->type = INT_TYPE;
+		val->i = x;
+	}
+	else {
+		float x = atof(str);
+		val->type = DOUBLE_TYPE;
+		val->d = x;
+	}
+      }
+      else {
+        printf("invalid");
+        texit(1);
+      }
+	else {
       printf(".");
     }
     list = cons(val, list);
