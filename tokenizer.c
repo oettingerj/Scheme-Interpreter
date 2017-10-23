@@ -177,6 +177,7 @@ Value *tokenize(){
         printf("invalid");
         texit(1);
       }
+     }
 	else {
       printf(".");
     }
