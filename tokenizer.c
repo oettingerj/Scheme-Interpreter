@@ -10,8 +10,62 @@ Methods to break input into tokens and assign types
 #include <stdbool.h>
 #include <stdlib.h>
 
-/*There's probably going to be a bunch of helper methods here
-*/
+bool canStartSymbol(char c){
+  if(isalpha(c)){
+    return true;
+  }
+  switch(c){
+    case '!':
+      return true;
+    case '$':
+      return true;
+    case '%':
+      return true;
+    case '&':
+      return true;
+    case '*':
+      return true;
+    case '/':
+      return true;
+    case ':':
+      return true;
+    case '<':
+      return true;
+    case '=':
+      return true;
+    case '>':
+      return true;
+    case '?':
+      return true;
+    case '~':
+      return true;
+    case '_':
+      return true;
+    case '^':
+      return true;
+    default:
+      return false;
+  }
+}
+
+bool canFinishSymbol(char c){
+  if(canStartSymbol(c)){
+    return true;
+  }
+  if(isdigit(c)){
+    return true;
+  }
+  switch(c){
+    case '.':
+      return true;
+    case '+':
+      return true;
+    case '-':
+      return true;
+    default:
+      return false;
+  }
+}
 
 /*This is just the code Jed said to use as a starter right now.
 */
@@ -24,9 +78,9 @@ Value *tokenize(){
     charRead = EOF;
   }
 
-  Value *val = talloc(sizeof(Value));
-
   while (charRead != EOF) {
+    Value *val = talloc(sizeof(Value));
+    val->type = NULL_TYPE;
     if (charRead == '(' ) {
       //Open parentheses
       val->type = OPEN_TYPE;
@@ -36,58 +90,60 @@ Value *tokenize(){
       val->type = CLOSE_TYPE;
       val->s = ")";
     } else if (charRead == '#') {
-        charRead = fgetc(stdin);
-        if (charRead == 't'){
-            val->type = BOOL_TYPE;
-            val->s = "#t";
-            list = cons(val, list);
-        }
-        else if (charRead == 'f'){
-            val->type = BOOL_TYPE;
-            val->s = "#f";
-            list = cons(val, list);
-        }
-        else {
-            printf("invalid");
-            texit(1);
-        }
+      charRead = fgetc(stdin);
+      if (charRead == 't'){
+        val->type = BOOL_TYPE;
+        val->s = "#t";
+        list = cons(val, list);
+      }
+      else if (charRead == 'f'){
+        val->type = BOOL_TYPE;
+        val->s = "#f";
+        list = cons(val, list);
+      }
+      else {
+        printf("invalid\n");
+        texit(1);
+      }
     } else if (charRead == '"') {
       //Strings
-      char str[256] = "";
-      int strLen = 0;
+      char str[256] = "\"";
+      int strLen = 1;
       charRead = fgetc(stdin);
       while(charRead != '"'){
         if(charRead == '\\'){
           charRead = fgetc(stdin);
           switch(charRead){
             case 'n':
-              str[strLen] = '\n';
-              strLen++;
-              break;
+            str[strLen] = '\n';
+            strLen++;
+            break;
             case 't':
-              str[strLen] = '\t';
-              strLen++;
-              break;
+            str[strLen] = '\t';
+            strLen++;
+            break;
             case '\\':
-              str[strLen] = '\\';
-              strLen++;
-              break;
+            str[strLen] = '\\';
+            strLen++;
+            break;
             case '\'':
-              str[strLen] = '\'';
-              strLen++;
-              break;
+            str[strLen] = '\'';
+            strLen++;
+            break;
             case '"':
-              str[strLen] = '"';
-              strLen++;
-              break;
+            str[strLen] = '"';
+            strLen++;
+            break;
             default:
-              break;
+            break;
           }
         } else{
           str[strLen] = charRead;
           strLen++;
         }
+        charRead = fgetc(stdin);
       }
+      str[strLen] = '"';
       val->type = STR_TYPE;
       val->s = str;
     } else if(charRead == '+' || charRead == '-') {
@@ -99,31 +155,32 @@ Value *tokenize(){
       if(charRead == ' '){
         val->type = SYMBOL_TYPE;
         val->s = str;
-      }
-      bool noDot = true;
-      while(isdigit(charRead) || (charRead == '.' && noDot == true)){
-        str[strLen] = charRead;
-        strLen++;
-	if(charRead == '.'){
-		noDot = false;
-	}
-	charRead = fgetc(stdin);
-      }
-      if (charRead==' '){
-	if(noDot){
-		int x = atoi(str);
-		val->type = INT_TYPE;
-		val->i = x;
-	}
-	else {
-		float x = atof(str);
-		val->type = DOUBLE_TYPE;
-		val->d = x;
-	}
-      }
-      else {
-        printf("invalid");
-        texit(1);
+      } else{
+        bool noDot = true;
+        while(isdigit(charRead) || (charRead == '.' && noDot == true)){
+          str[strLen] = charRead;
+          strLen++;
+          if(charRead == '.'){
+            noDot = false;
+          }
+          charRead = fgetc(stdin);
+        }
+        if (charRead==' '){
+          if(noDot){
+            int x = atoi(str);
+            val->type = INT_TYPE;
+            val->i = x;
+          }
+          else {
+            float x = atof(str);
+            val->type = DOUBLE_TYPE;
+            val->d = x;
+          }
+        }
+        else {
+          printf("invalid\n");
+          texit(1);
+        }
       }
     } else if(charRead == '.'){
       char str[256] = "";
@@ -132,23 +189,23 @@ Value *tokenize(){
       strLen++;
       charRead = fgetc(stdin);
       if(!isdigit(charRead)){
-	printf("invalid");
-	texit(1);
+        printf("invalid\n");
+        texit(1);
       }
       while(isdigit(charRead)){
-	str[strLen] = charRead;
+        str[strLen] = charRead;
         strLen++;
-	charRead = fgetc(stdin);
+        charRead = fgetc(stdin);
       }
       if(charRead == ' '){
-	float x = atof(str);
-	val->type = DOUBLE_TYPE;
-	val->d = x;
+        float x = atof(str);
+        val->type = DOUBLE_TYPE;
+        val->d = x;
       }
       else {
-        printf("invalid");
+        printf("invalid\n");
         texit(1);
-      }	
+      }
     } else if(isdigit(charRead)){
       char str[256] = "";
       int strLen = 0;
@@ -156,70 +213,95 @@ Value *tokenize(){
       while(isdigit(charRead) || (charRead == '.' && noDot == true)){
         str[strLen] = charRead;
         strLen++;
-	if(charRead == '.'){
-		noDot = false;
-	}
-	charRead = fgetc(stdin);
+        if(charRead == '.'){
+          noDot = false;
+        }
+        charRead = fgetc(stdin);
       }
-      if (charRead==' '){
-	if(noDot){
-		int x = atoi(str);
-		val->type = INT_TYPE;
-		val->i = x;
-	}
-	else {
-		float x = atof(str);
-		val->type = DOUBLE_TYPE;
-		val->d = x;
-	}
-      }
-      else {
-        printf("invalid");
+      if (charRead == ' '){
+        if(noDot){
+          int x = atoi(str);
+          val->type = INT_TYPE;
+          val->i = x;
+        }
+        else {
+          float x = atof(str);
+          val->type = DOUBLE_TYPE;
+          val->d = x;
+        }
+      } else if(charRead == ')'){
+        if(noDot){
+          int x = atoi(str);
+          val->type = INT_TYPE;
+          val->i = x;
+          ungetc(charRead, stdin);
+        } else {
+          float x = atof(str);
+          val->type = DOUBLE_TYPE;
+          val->d = x;
+          ungetc(charRead, stdin);
+        }
+      } else {
+        printf("invalid\n");
         texit(1);
       }
-     }
-	else {
-      printf(".");
+    } else if(charRead != ' '){
+      char str[256] = "";
+      int strLen = 0;
+      if(canStartSymbol(charRead)){
+        while(canFinishSymbol(charRead)){
+          str[strLen] = charRead;
+          strLen++;
+          charRead = fgetc(stdin);
+        }
+        val->type = SYMBOL_TYPE;
+        val->s = str;
+      }
     }
-    list = cons(val, list);
+
+    if(val->type != NULL_TYPE){
+      list = cons(val, list);
+    }
     charRead = fgetc(stdin);
     /*There's probably a better way to do this*/
     if(charRead == ';'){
       charRead = EOF;
     }
   }
+  printf("");
+  printf("");
   return reverse(list);
 }
 
 /*displayTokens, based in part on the linkedlist display
 */
 void displayTokens(Value *list) {
-	Value *current = list;
-	while(!isNull(current)){
-		switch(current->c.car->type){
-			case BOOL_TYPE:
-				printf("%s:boolean\n", current->c.car->s);
-			case INT_TYPE:
+  Value *current = list;
+  while(!isNull(current)){
+    switch(current->c.car->type){
+      case BOOL_TYPE:
+        printf("%s:boolean\n", current->c.car->s);
+      case INT_TYPE:
         printf("%i:integer\n", current->c.car->i);
-        break;
+      break;
       case DOUBLE_TYPE:
-       	printf("%f:float\n", current->c.car->d);
-        break;
+        printf("%f:float\n", current->c.car->d);
+      break;
       case STR_TYPE:
-      	printf("%s:string\n", current->c.car->s);
-				break;
-			case SYMBOL_TYPE:
-				printf("%s:symbol\n", current->c.car->s);
-				break;
-			case OPEN_TYPE:
-				printf("(:open\n");
-				break;
-			case CLOSE_TYPE:
-				printf("):close\n");
-				break;
-			default:
-				printf("invalid token type");
-		}
-		current = current->c.cdr;
-	}
+        printf("%s:string\n", current->c.car->s);
+      break;
+      case SYMBOL_TYPE:
+        printf("%s:symbol\n", current->c.car->s);
+      break;
+      case OPEN_TYPE:
+        printf("%s:open\n", current->c.car->s);
+      break;
+      case CLOSE_TYPE:
+        printf("%s:close\n", current->c.car->s);
+      break;
+      default:
+        printf("invalid token type");
+    }
+    current = current->c.cdr;
+  }
 }
