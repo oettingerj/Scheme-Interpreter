@@ -256,6 +256,7 @@ Value *tokenize(){
         }
         val->type = SYMBOL_TYPE;
         val->s = str;
+        ungetc(charRead, stdin);
       }
     }
 
