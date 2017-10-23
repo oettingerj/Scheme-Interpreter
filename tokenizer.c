@@ -36,9 +36,24 @@ Value *tokenize(){
       val->s = ")";
       list = cons(val, list);
     } else if (charRead == '#') {
-      /*create a string, add to it until space
-      which is also what we'll do for strings and
-      symbols*/
+        charRead = fgetc(stdin);
+        if (charRead == 't'){
+            val->type = BOOL_TYPE;
+            val->s = "#t";
+            list = cons(val, list);
+        }
+        else if (charRead == 'f'){
+            val->type = BOOL_TYPE;
+            val->s = "#f";
+            list = cons(val, list);
+        }
+        else {
+            printf("invalid");
+            texit(1);
+        }
+        /*create a string, add to it until space
+         which is also what we'll do for strings and
+         symbols*/
     } else if (charRead == '"') {
       //Strings
       char str[256] = "";
