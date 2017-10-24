@@ -1,11 +1,11 @@
 CC = clang
 CFLAGS = -g
 
-SRCS = linkedlist.c main_tokenize.c talloc.c tokenizer.c
-HDRS = linkedlist.h value.h talloc.h tokenizer.h
+SRCS = linkedlist.c main_parse.c talloc.c tokenizer.c parser.c
+HDRS = linkedlist.h value.h talloc.h tokenizer.h parser.h
 OBJS = $(SRCS:.c=.o)
 
-tokenizer: $(OBJS)
+parser: $(OBJS)
 	$(CC)  $(CFLAGS) $^  -o $@
 
 memtest: tokenizer
