@@ -309,11 +309,6 @@ void tokenizeSymbol(Value *val, char charRead){
     }
 }
 
-/*TODO:
-1. Increase string character limit
-2. 2 more test files
-*/
-
 /*
     Tokenizes scheme files, adding each token in order to a linkedlist
 */
