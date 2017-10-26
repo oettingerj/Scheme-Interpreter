@@ -34,7 +34,6 @@ Value *parse(Value *tokens) {
 				printf("Syntax error: too many close parentheses\n");
 				texit(1);
 			}
-			//expr = reverse(expr);
 			parse = cons(expr, parse);
 		}
 		else{
