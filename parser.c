@@ -1,4 +1,6 @@
-/*Nathaniel Lovin, Josh Oettinger, Tenzin Dolphen
+/*
+	parser.c
+	Nathaniel Lovin, Josh Oettinger, Tenzin Dolphen
 */
 
 #include <stdio.h>
@@ -8,7 +10,8 @@
 #include "tokenizer.h"
 #include <stdbool.h>
 
-/*Parse a list of tokens for a scheme tokens
+/*
+Parses a list of Scheme tokens
 Returns a parse tree
 */
 Value *parse(Value *tokens) {
@@ -49,7 +52,8 @@ Value *parse(Value *tokens) {
 	return parse;
 }
 
-/*Print a parse tree
+/*
+Prints out parse tree
 */
 void printTree(Value *tree){
 	bool first = true;
@@ -66,13 +70,13 @@ void printTree(Value *tree){
 				printf("%s", cur->s);
 				break;
 			case INT_TYPE:
-        			printf("%i", cur->i);
-        			break;
-      			case DOUBLE_TYPE:
-       				printf("%f", cur->d);
-        			break;
-      			case STR_TYPE:
-      				printf("%s", cur->s);
+        		printf("%i", cur->i);
+        		break;
+      		case DOUBLE_TYPE:
+       			printf("%f", cur->d);
+        		break;
+      		case STR_TYPE:
+      			printf("%s", cur->s);
 				break;
 			case SYMBOL_TYPE:
 				printf("%s", cur->s);
@@ -82,6 +86,8 @@ void printTree(Value *tree){
 				printTree(cur);
 				printf(")");
 				break;
-		}		
+			default:
+				break;
+		}
 	}
 }

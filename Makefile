@@ -16,4 +16,4 @@ memtest: tokenizer
 
 clean:
 	rm *.o
-	rm tokenizer
+	rm parser
