@@ -316,7 +316,8 @@ Value *tokenize(){
     char charRead;
     Value *list = makeNull();
     charRead = fgetc(stdin);
-
+    /*bool quote1 = false;
+    bool quote2 = false;*/
     while (charRead != EOF) {
         Value *val = talloc(sizeof(Value));
         val->type = NULL_TYPE;
@@ -328,7 +329,15 @@ Value *tokenize(){
             //Close parentheses
             val->type = CLOSE_TYPE;
             val->s = ")";
-        }else if (charRead == '#') {
+        } /*else if (charRead == '\''){
+            Value *open = talloc(sizeof(Value));
+            open->type = OPEN_TYPE;
+            open->s = "(";
+            list = cons(open, list);
+            val->type = SYMBOL_TYPE;
+            val->s = "'";
+            quote1 = true;
+        }*/ else if (charRead == '#') {
             tokenizeBoolean(val, charRead);
         }else if (charRead == '"') {
             tokenizeString(val, charRead);
@@ -348,6 +357,17 @@ Value *tokenize(){
 
         if(val->type != NULL_TYPE){
             list = cons(val, list);
+            /*if(quote1){
+                quote1 = false;
+                quote2 = true;
+            }
+            else if(quote2){
+                Value *close = talloc(sizeof(Value));
+                close->type = CLOSE_TYPE;
+                close->s = ")";
+                list = cons(close, list);
+                quote2 = false;
+            }*/
         }
         charRead = fgetc(stdin);
     }

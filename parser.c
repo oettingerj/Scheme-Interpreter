@@ -85,6 +85,9 @@ void printTree(Value *tree){
 				printTree(cur);
 				printf(")");
 				break;
+			case NULL_TYPE:
+				printf("()");
+				break;
 			default:
 				break;
 		}

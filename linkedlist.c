@@ -56,9 +56,9 @@ void display(Value *list) {
         printf("%f", current->c.car->d);
         break;
       case STR_TYPE:
-        printf("\"%s\"", current->c.car->s);
-				break;
-			case PTR_TYPE:
+        printf("%s", current->c.car->s);
+        break;
+      case PTR_TYPE:
 				printf("%p", current->c.car->p);
 				break;
       default:
