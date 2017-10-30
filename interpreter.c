@@ -11,7 +11,8 @@
 #include "talloc.h"
 #include "interpreter.h"
 
-/* Another freaking print function
+/*
+    Prints a Value
 */
 void printValue(Value *v){
     switch (v->type) {
@@ -58,8 +59,8 @@ void interpret(Value *tree){
 }
 
 /*
-    Evaluate
-    There's very little error checking right now
+    Evaluates expressions
+    Functions not implemented yet
 */
 Value *eval(Value *expr, Frame *frame){
 	if(expr->type == INT_TYPE || expr->type == DOUBLE_TYPE
@@ -94,7 +95,6 @@ Value *eval(Value *expr, Frame *frame){
 			return car(cdr(expr));
 		}
 		if(strcmp(car(expr)->s, "if") == 0){
-            /*need error messages*/
 			if(strcmp(eval(car(cdr(expr)), frame)->s, "#f") == 0){
 				return eval(car(cdr(cdr(cdr(expr)))), frame);
 			}
@@ -122,8 +122,7 @@ Value *eval(Value *expr, Frame *frame){
                 }
                 child->bindings = cons(variable, child->bindings);
             }
-            /*evaluate
-             multiple body expressions in let*/
+            /*evaluate multiple body expressions in let*/
             Value *body = cdr(cdr(expr));
             Value *result = eval(car(body), child);
             body = cdr(body);
