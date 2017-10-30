@@ -1,0 +1,3 @@
+(let ((x 23))
+  (let ((y (quote (c d))))
+    (if #f x y)))
