@@ -7,7 +7,6 @@
 
 int main(void) {
    Value *list = tokenize();
-    displayTokens(list);
    Value *tree = parse(list);
    interpret(tree);
    tfree();
