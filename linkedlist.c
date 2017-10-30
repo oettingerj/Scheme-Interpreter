@@ -100,7 +100,9 @@ Value *cdr(Value *list) {
  */
 int length(Value *value) {
 	int count = 0;
-	assert(value != NULL);
+	if(isNull(value)){
+		return 0;
+	}
 	assert(value->type == CONS_TYPE);
 	Value *cur = value;
 	while(!isNull(cur)){
