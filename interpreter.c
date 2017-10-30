@@ -31,6 +31,9 @@ void printValue(Value *v){
             while(!isNull(v)){
                 Value *cur = car(v);
                 printValue(cur);
+                if(!isNull(cdr(v))){
+                    printf(" ");
+                }
                 v = cdr(v);
             }
             printf(")");
@@ -47,10 +50,8 @@ void interpret(Value *tree){
 	parent->bindings = makeNull();
 	while(!isNull(tree)){
 		Value *cur = car(tree);
-		printValue(eval(cur, parent));
-        if(!isNull(cdr(tree)) && cdr(tree)->type != CONS_TYPE){
-            printf(" ");
-        }
+        Value *result = eval(cur, parent);
+		printValue(result);
 		tree = cdr(tree);
         printf("\n");
 	}
