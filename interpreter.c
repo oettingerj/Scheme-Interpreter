@@ -1,4 +1,6 @@
-/*Nathaniel Lovin, Josh Oettinger, Tenzin Dolphen
+/*
+    interpreter.c
+    Nathaniel Lovin, Josh Oettinger, Tenzin Dolphen
 */
 
 #include <stdio.h>
@@ -37,7 +39,8 @@ void printValue(Value *v){
     }
 }
 
-/*Takes a list of s-expressions, calls eval on them, and prints results
+/*
+    Takes a list of s-expressions, calls eval on them, and prints results
 */
 void interpret(Value *tree){
 	Frame *parent = talloc(sizeof(Frame));
@@ -50,8 +53,9 @@ void interpret(Value *tree){
 	}
 }
 
-/*Evaluate
- There's very little error checking right now
+/*
+    Evaluate
+    There's very little error checking right now
 */
 Value *eval(Value *expr, Frame *frame){
 	if(expr->type == INT_TYPE || expr->type == DOUBLE_TYPE
@@ -77,9 +81,9 @@ Value *eval(Value *expr, Frame *frame){
                     current= frame->bindings;
                 }
             }
-            
+
         }
-        
+
     }
 	if(expr->type == CONS_TYPE){
 		if(strcmp(car(expr)->s, "quote") == 0){
