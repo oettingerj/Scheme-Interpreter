@@ -111,8 +111,6 @@ Value *eval(Value *expr, Frame *frame){
                 while(!isNull(current)){
                     Value *val = car(current);
                     current = cdr(current);
-                    printf("%s ", car(variable)->s);
-                    printf("%s\n", car(val)->s);
                     if(strcmp(car(variable)->s,car(val)->s) == 0){
                         printf("let: duplicate identifier in: %s\n",car(val)->s);
                         texit(1);
