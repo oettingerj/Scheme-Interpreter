@@ -16,15 +16,15 @@
 void printValue(Value *v){
     switch (v->type) {
         case INT_TYPE:
-            printf("%i ", v->i);
+            printf("%i", v->i);
             break;
         case DOUBLE_TYPE:
-            printf("%f ", v->d);
+            printf("%f", v->d);
             break;
         case STR_TYPE:
         case BOOL_TYPE:
         case SYMBOL_TYPE:
-            printf("%s ", v->s);
+            printf("%s", v->s);
             break;
         case CONS_TYPE:
             printf("(");
@@ -48,6 +48,9 @@ void interpret(Value *tree){
 	while(!isNull(tree)){
 		Value *cur = car(tree);
 		printValue(eval(cur, parent));
+        if(!isNull(cdr(tree)) && cdr(tree)->type != CONS_TYPE){
+            printf(" ");
+        }
 		tree = cdr(tree);
         printf("\n");
 	}
