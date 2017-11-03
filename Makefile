@@ -16,4 +16,7 @@ memtest: tokenizer
 
 clean:
 	rm *.o
+	rm linkedlist
+	rm talloc
+	rm parser
 	rm interpreter
