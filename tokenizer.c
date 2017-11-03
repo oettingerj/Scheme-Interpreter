@@ -81,7 +81,7 @@ void tokenizeString(Value *val, char charRead){
     }
     str[strLen] = '"';
     strLen++;
-    str[strLen] = 0;
+    str[strLen] = "\0";
     val->type = STR_TYPE;
     val->s = str;
 }
@@ -119,6 +119,7 @@ void tokenizeOperators(Value *val, char charRead){
             }
             charRead = fgetc(stdin);
         }
+        str[strLen] = "\0";
         if (charRead == ' ' || charRead == ')' || charRead == ';'
 		|| charRead == '\n'){
             if(noDot){
@@ -165,6 +166,7 @@ void tokenizeNumberStartingWithDecimal(Value *val, char charRead){
         strLen++;
         charRead = fgetc(stdin);
     }
+    str[strLen] = "\0";
     if(charRead == ' ' || charRead == ')' || charRead== ';'
 		|| charRead == '\n'){
         float x = atof(str);
@@ -200,6 +202,7 @@ void tokenizeNumber(Value *val, char charRead){
         }
         charRead = fgetc(stdin);
     }
+    str[strLen] = "\0";
     if (charRead == ' ' || charRead == ';' || charRead == ')'
 		|| charRead == '\n'){
         if(noDot){
