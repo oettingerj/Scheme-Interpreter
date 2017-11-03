@@ -33,10 +33,10 @@ void tokenizeBoolean(Value *val, char charRead){
     Tokenizes string types
 */
 void tokenizeString(Value *val, char charRead){
-    char *str = talloc(sizeof(char)*32);
+    char *str = talloc(sizeof(char)*100);
     str[0] = '"';
     int strLen = 1;
-    int strSize = 32;
+    int strSize = 100;
     charRead = fgetc(stdin);
     while(charRead != '"'){
         if(strSize - strLen <= 2){
@@ -90,9 +90,9 @@ void tokenizeString(Value *val, char charRead){
     Tokenizes operators + and -
 */
 void tokenizeOperators(Value *val, char charRead){
-    char *str = talloc(sizeof(char)*32);
+    char *str = talloc(sizeof(char)*100);
     int strLen = 0;
-    int strSize = 32;
+    int strSize = 100;
     str[strLen] = charRead;
     strLen++;
     charRead = fgetc(stdin);
@@ -119,7 +119,7 @@ void tokenizeOperators(Value *val, char charRead){
             }
             charRead = fgetc(stdin);
         }
-        if (charRead == ' ' || charRead == ')' || charRead == ';' 
+        if (charRead == ' ' || charRead == ')' || charRead == ';'
 		|| charRead == '\n'){
             if(noDot){
                 int x = atoi(str);
@@ -143,9 +143,9 @@ void tokenizeOperators(Value *val, char charRead){
     Tokenizes numbers that start with a decimal (e.g. .56)
 */
 void tokenizeNumberStartingWithDecimal(Value *val, char charRead){
-    char *str = talloc(sizeof(char)*32);
+    char *str = talloc(sizeof(char)*100);
     int strLen = 0;
-    int strSize = 32;
+    int strSize = 100;
     str[strLen] = charRead;
     strLen++;
     charRead = fgetc(stdin);
@@ -181,9 +181,9 @@ void tokenizeNumberStartingWithDecimal(Value *val, char charRead){
     Tokenizes numbers that start with a digit
 */
 void tokenizeNumber(Value *val, char charRead){
-    char *str = talloc(sizeof(char)*32);
+    char *str = talloc(sizeof(char)*100);
     int strLen = 0;
-    int strSize = 32;
+    int strSize = 100;
     bool noDot = true;
     while(isdigit(charRead) || (charRead == '.' && noDot == true)){
         if(strSize - strLen <= 1){
@@ -286,9 +286,9 @@ bool canFinishSymbol(char c){
     Tokenizes symbols
 */
 void tokenizeSymbol(Value *val, char charRead){
-    char *str = talloc(sizeof(char)*32);
+    char *str = talloc(sizeof(char)*100);
     int strLen = 0;
-    int strSize = 32;
+    int strSize = 100;
     if(canStartSymbol(charRead)){
         while(canFinishSymbol(charRead)){
             if(strSize - strLen <= 1){
