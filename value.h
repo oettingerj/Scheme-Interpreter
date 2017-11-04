@@ -2,12 +2,6 @@
 #ifndef VALUE_H
 #define VALUE_H
 
-struct Frame {
-   struct Value *bindings;
-   struct Frame *parent;
-};
-typedef struct Frame Frame;
-
 typedef enum {
    PTR_TYPE,
    INT_TYPE,
@@ -37,7 +31,7 @@ struct Value {
       struct Closure {
           struct Value *params;
           struct Value *body;
-          Frame *frame;
+          struct Frame *frame;
       } clo;
    };
 };

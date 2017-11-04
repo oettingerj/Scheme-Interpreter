@@ -49,6 +49,7 @@ void printValue(Value *v){
 void interpret(Value *tree){
 	Frame *parent = talloc(sizeof(Frame));
 	parent->bindings = makeNull();
+    parent->hasParent = 0;
 	while(!isNull(tree)){
 		Value *cur = car(tree);
         Value *result = eval(cur, parent);
@@ -114,7 +115,7 @@ Value *eval(Value *expr, Frame *frame){
                 if(strcmp(car(val)->s,expr->s) == 0){
                     return eval(car(cdr(val)),frame);
                 }
-                if(isNull(current)){
+                if(isNull(current) && frame->hasParent){
                     frame = frame->parent;
                     current = frame->bindings;
                 }
