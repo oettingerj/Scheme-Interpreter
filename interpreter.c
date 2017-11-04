@@ -57,10 +57,42 @@ void interpret(Value *tree){
         printf("\n");
 	}
 }
+/*
+    Applies a function to its args
+*/
+Value *apply(Value *function, Value *args){
+    if(function->type == CLOSURE_TYPE){
+        Frame *child = talloc(sizeof(Frame));
+        child->parent = function->clo.frame;
+        Value *actual = args;
+        Value *formal = function->clo.params;
+        while(!isNull(formal)){
+            if(isNull(actual)){
+                printf("Incorrect number of params");
+                texit(1);
+            } else{
+                Value *binding = cons(formal, actual);
+                child->bindings = cons(binding, child->bindings);
+                actual = cdr(actual);
+                formal = cdr(formal);
+            }
+        }
+
+        Value *body = function->clo.body;
+        Value *result = eval(car(body), child);
+        body = cdr(body);
+        while(!isNull(body)){
+            result = eval(car(body), child);
+            body = cdr(body);
+        }
+        return result;
+    } else{
+        return makeNull();
+    }
+}
 
 /*
     Evaluates expressions
-    Functions not implemented yet
 */
 Value *eval(Value *expr, Frame *frame){
 	if(expr->type == INT_TYPE || expr->type == DOUBLE_TYPE
@@ -83,10 +115,9 @@ Value *eval(Value *expr, Frame *frame){
                 }
                 if(isNull(current)){
                     frame = frame->parent;
-                    current= frame->bindings;
+                    current = frame->bindings;
                 }
             }
-
         }
 
     }
@@ -132,6 +163,29 @@ Value *eval(Value *expr, Frame *frame){
             }
             return result;
         }
+        if(strcmp(car(expr)->s, "define") == 0){
+            Value *variable = cdr(expr);
+            frame->bindings = cons(variable, frame->bindings);
+            Value *v = talloc(sizeof(Value));
+            v->type = VOID_TYPE;
+            return v;
+        }
+        if(strcmp(car(expr)->s, "lambda") == 0){
+            Value *closure = talloc(sizeof(Value));
+            closure->type = CLOSURE_TYPE;
+            closure->clo.params = car(cdr(expr));
+            closure->clo.body = car(cdr(cdr(expr)));
+            closure->clo.frame = frame;
+            return closure;
+        }
+        Value *values = makeNull();
+        Value *current = expr;
+        while(!isNull(current)){
+            values = cons(eval(car(current), frame), values);
+            current = cdr(current);
+        }
+        values = reverse(values);
+        return apply(car(values), cdr(values));
 	}
 	return makeNull();
 }

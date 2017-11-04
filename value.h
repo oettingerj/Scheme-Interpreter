@@ -1,5 +1,12 @@
+
 #ifndef VALUE_H
 #define VALUE_H
+
+struct Frame {
+   struct Value *bindings;
+   struct Frame *parent;
+};
+typedef struct Frame Frame;
 
 typedef enum {
    PTR_TYPE,
@@ -12,8 +19,8 @@ typedef enum {
    OPEN_TYPE,
    CLOSE_TYPE,
    SYMBOL_TYPE,
-    VOID_TYPE,
-    CLOSURE_TYPE
+   VOID_TYPE,
+   CLOSURE_TYPE
 } valueType;
 
 struct Value {
@@ -26,7 +33,12 @@ struct Value {
       struct ConsCell {
          struct Value *car;
          struct Value *cdr;
-      } c;
+     } c;
+      struct Closure {
+          struct Value *params;
+          struct Value *body;
+          Frame *frame;
+      } clo;
    };
 };
 
