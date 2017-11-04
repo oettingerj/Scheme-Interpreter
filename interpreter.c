@@ -93,6 +93,16 @@ Value *apply(Value *function, Value *args){
     }
 }
 
+Value *eval_combination(Value *expr, Frame *frame){
+    Value *values = makeNull();
+    while(!isNull(expr)){
+        values = cons(eval(car(expr), frame), values);
+        expr = cdr(expr);
+    }
+    values = reverse(values);
+    return values;
+}
+
 /*
     Evaluates expressions
 */
@@ -165,15 +175,14 @@ Value *eval(Value *expr, Frame *frame){
             return result;
         }
         if(strcmp(car(expr)->s, "define") == 0){
-            printf("boutta define sum lamb");
-            Value *variable = cons(car(cdr(expr)), eval(car(cdr(cdr(expr))), frame));
+            Value *variable = cons(car(cdr(expr)), eval(car(cdr(cdr(expr))),
+                                                        frame));
             frame->bindings = cons(variable, frame->bindings);
             Value *v = talloc(sizeof(Value));
             v->type = VOID_TYPE;
             return v;
         }
         if(strcmp(car(expr)->s, "lambda") == 0){
-            printf("got dat sweet lamb");
             Value *closure = talloc(sizeof(Value));
             closure->type = CLOSURE_TYPE;
             closure->clo.params = car(cdr(expr));
@@ -181,14 +190,8 @@ Value *eval(Value *expr, Frame *frame){
             closure->clo.frame = frame;
             return closure;
         }
-        Value *values = makeNull();
-        Value *current = expr;
-        while(!isNull(current)){
-            values = cons(eval(car(current), frame), values);
-            current = cdr(current);
-        }
-        values = reverse(values);
-        return apply(car(values), cdr(values));
+        //Value *values = eval_combination(expr, frame);
+        return apply(car(expr), cdr(expr));
 	}
 	return makeNull();
 }
