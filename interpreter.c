@@ -121,7 +121,6 @@ Value *eval(Value *expr, Frame *frame){
                 }
             }
         }
-
     }
 	if(expr->type == CONS_TYPE){
 		if(strcmp(car(expr)->s, "quote") == 0){
@@ -166,13 +165,15 @@ Value *eval(Value *expr, Frame *frame){
             return result;
         }
         if(strcmp(car(expr)->s, "define") == 0){
-            Value *variable = cdr(expr);
+            printf("boutta define sum lamb");
+            Value *variable = cons(car(cdr(expr)), eval(car(cdr(cdr(expr))), frame));
             frame->bindings = cons(variable, frame->bindings);
             Value *v = talloc(sizeof(Value));
             v->type = VOID_TYPE;
             return v;
         }
         if(strcmp(car(expr)->s, "lambda") == 0){
+            printf("got dat sweet lamb");
             Value *closure = talloc(sizeof(Value));
             closure->type = CLOSURE_TYPE;
             closure->clo.params = car(cdr(expr));
