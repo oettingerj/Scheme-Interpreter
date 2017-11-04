@@ -63,6 +63,7 @@ void interpret(Value *tree){
 Value *apply(Value *function, Value *args){
     if(function->type == CLOSURE_TYPE){
         Frame *child = talloc(sizeof(Frame));
+        child->bindings = makeNull();
         child->parent = function->clo.frame;
         Value *actual = args;
         Value *formal = function->clo.params;
