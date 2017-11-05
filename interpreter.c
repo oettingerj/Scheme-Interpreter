@@ -10,6 +10,7 @@
 #include "linkedlist.h"
 #include "talloc.h"
 #include "interpreter.h"
+#include <assert.h>
 
 /*
     Prints a Value
@@ -23,21 +24,29 @@ void printValue(Value *v){
             printf("%f", v->d);
             break;
         case STR_TYPE:
+            printf("%s", v->s);
+            break;
         case BOOL_TYPE:
+            printf("%s", v->s);
+            break;
         case SYMBOL_TYPE:
             printf("%s", v->s);
             break;
+        case CLOSURE_TYPE:
+            printf("[procedure]");
+            break;
         case CONS_TYPE:
             printf("(");
-            while(!isNull(v)){
-                Value *cur = car(v);
-                printValue(cur);
-                if(!isNull(cdr(v))){
+            Value *cur = v;
+            while(!isNull(cur)){
+                printValue(car(cur));
+                if(!isNull(cdr(cur))){
                     printf(" ");
                 }
-                v = cdr(v);
+                cur = cdr(cur);
             }
             printf(")");
+            break;
         default:
             break;
     }
@@ -175,8 +184,7 @@ Value *eval(Value *expr, Frame *frame){
             return result;
         }
         if(strcmp(car(expr)->s, "define") == 0){
-            Value *variable = cons(car(cdr(expr)), eval(car(cdr(cdr(expr))),
-                                                        frame));
+            Value *variable = cdr(expr);
             frame->bindings = cons(variable, frame->bindings);
             Value *v = talloc(sizeof(Value));
             v->type = VOID_TYPE;
@@ -186,12 +194,12 @@ Value *eval(Value *expr, Frame *frame){
             Value *closure = talloc(sizeof(Value));
             closure->type = CLOSURE_TYPE;
             closure->clo.params = car(cdr(expr));
-            closure->clo.body = car(cdr(cdr(expr)));
+            closure->clo.body = cdr(cdr(expr));
             closure->clo.frame = frame;
             return closure;
         }
-        //Value *values = eval_combination(expr, frame);
-        return apply(car(expr), cdr(expr));
+        Value *values = eval_combination(expr, frame);
+        return apply(car(values), cdr(values));
 	}
 	return makeNull();
 }

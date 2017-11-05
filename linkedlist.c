@@ -24,10 +24,10 @@ Value *makeNull() {
  */
 Value *cons(Value *car, Value *cdr) {
 	Value *consVal = talloc(sizeof(Value));
-  consVal->type = CONS_TYPE;
-  consVal->c.car = car;
-  consVal->c.cdr = cdr;
-  return consVal;
+  	consVal->type = CONS_TYPE;
+  	consVal->c.car = car;
+  	consVal->c.cdr = cdr;
+  	return consVal;
 }
 
 /*
