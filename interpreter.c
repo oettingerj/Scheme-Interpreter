@@ -63,7 +63,9 @@ void interpret(Value *tree){
 		Value *cur = car(tree);
         Value *result = eval(cur, parent);
 		printValue(result);
-        printf("\n");
+        if(result->type != VOID_TYPE){
+            printf("\n");
+        }
 		tree = cdr(tree);
 	}
 }
@@ -83,7 +85,7 @@ Value *apply(Value *function, Value *args){
                 printf("Incorrect number of params");
                 texit(1);
             } else{
-                Value *binding = cons(car(formal), car(actual));
+                Value *binding = cons(car(formal), cons(car(actual), makeNull()));
                 //printValue(binding);
                 child->bindings = cons(binding, child->bindings);
                 actual = cdr(actual);
@@ -134,7 +136,7 @@ Value *eval(Value *expr, Frame *frame){
                 Value *val = car(current);
                 current = cdr(current);
                 if(strcmp(car(val)->s,expr->s) == 0){
-                    return eval(car(cdr(val)),frame);
+                    return eval(car(cdr(val)), frame);
                 }
                 if(isNull(current) && frame->hasParent){
                     frame = frame->parent;
