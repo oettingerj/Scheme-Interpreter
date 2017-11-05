@@ -80,7 +80,7 @@ void display(Value *list) {
  */
 Value *car(Value *list){
 	assert(list != NULL);
-	assert(list->type == CONS_TYPE);
+	//assert(list->type == CONS_TYPE);
 	return list->c.car;
 }
 
