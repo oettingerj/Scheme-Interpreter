@@ -75,6 +75,7 @@ Value *apply(Value *function, Value *args){
         Frame *child = talloc(sizeof(Frame));
         child->bindings = makeNull();
         child->parent = function->clo.frame;
+        child->hasParent = 1;
         Value *actual = args;
         Value *formal = function->clo.params;
         while(!isNull(formal)){
@@ -157,6 +158,7 @@ Value *eval(Value *expr, Frame *frame){
             /*bind variables*/
             Frame *child = talloc(sizeof(Frame));
             child->parent = frame;
+            child->hasParent = 1;
             child->bindings = makeNull();
             Value *formals = car(cdr(expr));
             while(!isNull(formals)){
