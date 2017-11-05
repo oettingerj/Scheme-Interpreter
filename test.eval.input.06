@@ -1,0 +1,6 @@
+(define hello
+	(lambda () (quote hello)))
+
+(define goodbye (lambda () (quote goodbye)))
+
+((if #f hello goodbye))
