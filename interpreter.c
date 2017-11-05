@@ -83,7 +83,7 @@ Value *apply(Value *function, Value *args){
                 printf("Incorrect number of params");
                 texit(1);
             } else{
-                Value *binding = cons(formal, actual);
+                Value *binding = cons(car(formal), car(actual));
                 //printValue(binding);
                 child->bindings = cons(binding, child->bindings);
                 actual = cdr(actual);
@@ -205,4 +205,5 @@ Value *eval(Value *expr, Frame *frame){
         Value *values = eval_combination(expr, frame);
         return apply(car(values), cdr(values));
 	}
+    return expr;
 }
