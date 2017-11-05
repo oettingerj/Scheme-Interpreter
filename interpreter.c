@@ -148,12 +148,13 @@ Value *eval(Value *expr, Frame *frame){
 			return car(cdr(expr));
 		}
 		if(strcmp(car(expr)->s, "if") == 0){
-			if(strcmp(eval(car(cdr(expr)), frame)->s, "#t") != 0){
-				return eval(car(cdr(cdr(cdr(expr)))), frame);
-			}
-			else{
-				return eval(car(cdr(cdr(expr))), frame);
-			}
+            Value *cond = eval(car(cdr(expr)), frame);
+            if(cond->type == BOOL_TYPE){
+                if(strcmp(eval(car(cdr(expr)), frame)->s, "#t") != 0){
+    				return eval(car(cdr(cdr(cdr(expr)))), frame);
+    			}
+            }
+			return eval(car(cdr(cdr(expr))), frame);
 		}
         if(strcmp(car(expr)->s, "let") == 0){
             /*bind variables*/
