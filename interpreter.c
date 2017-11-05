@@ -63,8 +63,8 @@ void interpret(Value *tree){
 		Value *cur = car(tree);
         Value *result = eval(cur, parent);
 		printValue(result);
-		tree = cdr(tree);
         printf("\n");
+		tree = cdr(tree);
 	}
 }
 /*
@@ -84,6 +84,7 @@ Value *apply(Value *function, Value *args){
                 texit(1);
             } else{
                 Value *binding = cons(formal, actual);
+                //printValue(binding);
                 child->bindings = cons(binding, child->bindings);
                 actual = cdr(actual);
                 formal = cdr(formal);
@@ -147,7 +148,7 @@ Value *eval(Value *expr, Frame *frame){
 			return car(cdr(expr));
 		}
 		if(strcmp(car(expr)->s, "if") == 0){
-			if(strcmp(eval(car(cdr(expr)), frame)->s, "#f") == 0){
+			if(strcmp(eval(car(cdr(expr)), frame)->s, "#t") != 0){
 				return eval(car(cdr(cdr(cdr(expr)))), frame);
 			}
 			else{
@@ -203,5 +204,4 @@ Value *eval(Value *expr, Frame *frame){
         Value *values = eval_combination(expr, frame);
         return apply(car(values), cdr(values));
 	}
-	return makeNull();
 }
