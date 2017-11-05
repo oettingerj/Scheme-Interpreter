@@ -8,7 +8,7 @@ OBJS = $(SRCS:.c=.o)
 interpreter: $(OBJS)
 	$(CC)  $(CFLAGS) $^  -o $@
 
-memtest: tokenizer
+memtest: interpreter
 	valgrind --leak-check=full --show-leak-kinds=all ./$<
 
 %.o : %.c $(HDRS)
