@@ -24,7 +24,7 @@ void tokenizeBoolean(Value *val, char charRead){
         val->s = "#f";
     }
     else {
-        printf("invalid\n");
+        printf("Invalid char '%c' following '#'\n", charRead);
         texit(1);
     }
 }
@@ -134,7 +134,7 @@ void tokenizeOperators(Value *val, char charRead){
             }
             ungetc(charRead,stdin);
         } else {
-            printf("Invalid token\n");
+            printf("Invalid character '%c' in number\n", charRead);
             texit(1);
         }
     }
@@ -151,7 +151,7 @@ void tokenizeNumberStartingWithDecimal(Value *val, char charRead){
     strLen++;
     charRead = fgetc(stdin);
     if(!isdigit(charRead)){
-        printf("Invalid token\n");
+        printf("Invalid character '%c' in number\n", charRead);
         texit(1);
     }
     while(isdigit(charRead)){
@@ -174,7 +174,7 @@ void tokenizeNumberStartingWithDecimal(Value *val, char charRead){
         val->d = x;
         ungetc(charRead, stdin);
     } else {
-        printf("Invalid token\n");
+        printf("Invalid character '%c' in number\n", charRead);
         texit(1);
     }
 }
@@ -217,7 +217,7 @@ void tokenizeNumber(Value *val, char charRead){
         }
         ungetc(charRead, stdin);
     } else {
-        printf("Invalid token\n");
+        printf("Invalid character '%c' in number\n", charRead);
         texit(1);
     }
 }

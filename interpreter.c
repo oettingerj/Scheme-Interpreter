@@ -117,19 +117,17 @@ Value *eval_combination(Value *expr, Frame *frame){
 
 //Evaluates a symbol and returns its value
 Value *eval_symbol(Value *expr, Frame *frame){
-    else{
-        /*loop through bindings, then parent, error if not in bindings*/
-        Value *current = frame->bindings;
-        while(!isNull(current)){
-            Value *val = car(current);
-            current = cdr(current);
-            if(strcmp(car(val)->s,expr->s) == 0){
-                return eval(car(cdr(val)), frame);
-            }
-            if(isNull(current) && frame->hasParent){
-                frame = frame->parent;
-                current = frame->bindings;
-            }
+    //Loop through bindings, then parent, error if not in bindings
+    Value *current = frame->bindings;
+    while(!isNull(current)){
+        Value *val = car(current);
+        current = cdr(current);
+        if(strcmp(car(val)->s,expr->s) == 0){
+            return eval(car(cdr(val)), frame);
+        }
+        if(isNull(current) && frame->hasParent){
+            frame = frame->parent;
+            current = frame->bindings;
         }
     }
     printf("Error: symbol '%s' not defined\n", expr->s);
