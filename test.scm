@@ -10,4 +10,4 @@
     
 (tofu 23 #f #t)
 
-(quote ())
+(quote 5)
