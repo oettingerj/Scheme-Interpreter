@@ -85,7 +85,8 @@ Value *apply(Value *function, Value *args){
                 printf("Incorrect number of params");
                 texit(1);
             } else{
-                Value *binding = cons(car(formal), cons(car(actual), makeNull()));
+                Value *binding = cons(car(formal), cons(car(actual),
+                                                        makeNull()));
                 //printValue(binding);
                 child->bindings = cons(binding, child->bindings);
                 actual = cdr(actual);
@@ -150,47 +151,66 @@ Value *eval(Value *expr, Frame *frame){
     }
 	if(expr->type == CONS_TYPE){
 		if(strcmp(car(expr)->s, "quote") == 0){
-			return car(cdr(expr));
+            if(!isNull(car(cdr(expr)))){
+                return car(cdr(expr));
+            } else{
+                printf("Incorrect number of args in 'quote'\n");
+                texit(1);
+            }
 		}
 		if(strcmp(car(expr)->s, "if") == 0){
-            Value *cond = eval(car(cdr(expr)), frame);
-            if(cond->type == BOOL_TYPE){
-                if(strcmp(eval(car(cdr(expr)), frame)->s, "#t") != 0){
-    				return eval(car(cdr(cdr(cdr(expr)))), frame);
-    			}
+            if(!isNull(car(cdr(expr))) && !isNull(car(cdr(cdr(expr))))){
+                Value *cond = eval(car(cdr(expr)), frame);
+                if(cond->type == BOOL_TYPE){
+                    if(strcmp(eval(car(cdr(expr)), frame)->s, "#t") != 0){
+        				return eval(car(cdr(cdr(cdr(expr)))), frame);
+        			}
+                }
+    			return eval(car(cdr(cdr(expr))), frame);
+            } else{
+                printf("Incorrect number of args in 'if'\n");
+                texit(1);
             }
-			return eval(car(cdr(cdr(expr))), frame);
 		}
         if(strcmp(car(expr)->s, "let") == 0){
-            /*bind variables*/
-            Frame *child = talloc(sizeof(Frame));
-            child->parent = frame;
-            child->hasParent = 1;
-            child->bindings = makeNull();
-            Value *formals = car(cdr(expr));
-            while(!isNull(formals)){
-                Value *variable = car(formals);
-                formals = cdr(formals);
-                Value *current = child->bindings;
-                while(!isNull(current)){
-                    Value *val = car(current);
-                    current = cdr(current);
-                    if(strcmp(car(variable)->s,car(val)->s) == 0){
-                        printf("let: duplicate identifier in: %s\n",car(val)->s);
+            if(!isNull(car(cdr(expr))) && !isNull(cdr(cdr(expr)))){
+                /*bind variables*/
+                Frame *child = talloc(sizeof(Frame));
+                child->parent = frame;
+                child->hasParent = 1;
+                child->bindings = makeNull();
+                Value *formals = car(cdr(expr));
+                while(!isNull(formals)){
+                    Value *variable = car(formals);
+                    if(isNull(variable)){
+                        printf("Error: empty pair in let expression\n");
                         texit(1);
                     }
+                    formals = cdr(formals);
+                    Value *current = child->bindings;
+                    while(!isNull(current)){
+                        Value *val = car(current);
+                        current = cdr(current);
+                        if(strcmp(car(variable)->s,car(val)->s) == 0){
+                            printf("let: duplicate identifier: %s\n",car(val)->s);
+                            texit(1);
+                        }
+                    }
+                    child->bindings = cons(variable, child->bindings);
                 }
-                child->bindings = cons(variable, child->bindings);
-            }
-            /*evaluate multiple body expressions in let*/
-            Value *body = cdr(cdr(expr));
-            Value *result = eval(car(body), child);
-            body = cdr(body);
-            while(!isNull(body)){
-                result = eval(car(body), child);
+                /*evaluate multiple body expressions in let*/
+                Value *body = cdr(cdr(expr));
+                Value *result = eval(car(body), child);
                 body = cdr(body);
+                while(!isNull(body)){
+                    result = eval(car(body), child);
+                    body = cdr(body);
+                }
+                return result;
+            } else{
+                printf("Incorrect number of args in 'let'\n");
+                texit(1);
             }
-            return result;
         }
         if(strcmp(car(expr)->s, "define") == 0){
             Value *variable = cdr(expr);
@@ -210,5 +230,7 @@ Value *eval(Value *expr, Frame *frame){
         Value *values = eval_combination(expr, frame);
         return apply(car(values), cdr(values));
 	}
-    return expr;
+    printf("Error: invalid expression");
+    texit(1);
+    return makeNull();
 }
