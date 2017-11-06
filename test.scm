@@ -9,3 +9,5 @@
       (if cond nconseq nalt))))
     
 (tofu 23 #f #t)
+
+(if #t #f)

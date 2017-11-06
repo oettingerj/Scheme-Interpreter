@@ -159,11 +159,16 @@ Value *eval(Value *expr, Frame *frame){
             }
 		}
 		if(strcmp(car(expr)->s, "if") == 0){
-            if(!isNull(car(cdr(expr))) && !isNull(car(cdr(cdr(expr))))){
+            if(!isNull(cdr(expr)) && !isNull(cdr(cdr(expr)))){
                 Value *cond = eval(car(cdr(expr)), frame);
                 if(cond->type == BOOL_TYPE){
                     if(strcmp(eval(car(cdr(expr)), frame)->s, "#t") != 0){
-        				return eval(car(cdr(cdr(cdr(expr)))), frame);
+                        if(!isNull(cdr(cdr(cdr(expr))))){
+                            return eval(car(cdr(cdr(cdr(expr)))), frame);
+                        } else{
+                            printf("No false case found in if statement\n");
+                            texit(1);
+                        }
         			}
                 }
     			return eval(car(cdr(cdr(expr))), frame);
@@ -173,7 +178,7 @@ Value *eval(Value *expr, Frame *frame){
             }
 		}
         if(strcmp(car(expr)->s, "let") == 0){
-            if(!isNull(car(cdr(expr))) && !isNull(cdr(cdr(expr)))){
+            if(!isNull(cdr(cdr(expr)))){
                 /*bind variables*/
                 Frame *child = talloc(sizeof(Frame));
                 child->parent = frame;
