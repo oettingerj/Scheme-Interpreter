@@ -10,11 +10,9 @@
 #include "linkedlist.h"
 #include "talloc.h"
 #include "interpreter.h"
-#include <assert.h>
 
-/*
-    Prints a Value
-*/
+
+//Prints a Value
 void printValue(Value *v){
     switch (v->type) {
         case INT_TYPE:
@@ -52,9 +50,7 @@ void printValue(Value *v){
     }
 }
 
-/*
-    Takes a list of s-expressions, calls eval on them, and prints results
-*/
+//Takes a list of s-expressions, calls eval on them, and prints results
 void interpret(Value *tree){
 	Frame *parent = talloc(sizeof(Frame));
 	parent->bindings = makeNull();
@@ -69,9 +65,8 @@ void interpret(Value *tree){
 		tree = cdr(tree);
 	}
 }
-/*
-    Applies a function to its args
-*/
+
+//Applies a function to its args
 Value *apply(Value *function, Value *args){
     if(function->type == CLOSURE_TYPE){
         Frame *child = talloc(sizeof(Frame));
@@ -82,12 +77,11 @@ Value *apply(Value *function, Value *args){
         Value *formal = function->clo.params;
         while(!isNull(formal)){
             if(isNull(actual)){
-                printf("Incorrect number of params");
+                printf("Incorrect number of params in function");
                 texit(1);
             } else{
                 Value *binding = cons(car(formal), cons(car(actual),
                                                         makeNull()));
-                //printValue(binding);
                 child->bindings = cons(binding, child->bindings);
                 actual = cdr(actual);
                 formal = cdr(formal);
@@ -108,7 +102,8 @@ Value *apply(Value *function, Value *args){
 }
 
 /*
-    Evaluates a list of expressions and returns a list of those evaluated exprs
+    Evaluates a list of expressions and returns a list of
+    those evaluated expressions
 */
 Value *eval_combination(Value *expr, Frame *frame){
     Value *values = makeNull();
@@ -120,121 +115,158 @@ Value *eval_combination(Value *expr, Frame *frame){
     return values;
 }
 
-/*
-    Evaluates expressions
-*/
+//Evaluates a symbol and returns its value
+Value *eval_symbol(Value *expr, Frame *frame){
+    else{
+        /*loop through bindings, then parent, error if not in bindings*/
+        Value *current = frame->bindings;
+        while(!isNull(current)){
+            Value *val = car(current);
+            current = cdr(current);
+            if(strcmp(car(val)->s,expr->s) == 0){
+                return eval(car(cdr(val)), frame);
+            }
+            if(isNull(current) && frame->hasParent){
+                frame = frame->parent;
+                current = frame->bindings;
+            }
+        }
+    }
+    printf("Error: symbol '%s' not defined\n", expr->s);
+    texit(1);
+    return makeNull();
+}
+
+//Evaluates a quote expression and returns its value
+Value *eval_quote(Value *expr, Frame *frame){
+    if(!isNull(cdr(expr))){
+        if(isNull(car(cdr(expr)))){
+            return cdr(expr);
+        } else{
+            return car(cdr(expr));
+        }
+    }
+    printf("Incorrect number of args in 'quote'\n");
+    texit(1);
+    return makeNull();
+}
+
+//Evaluates an if statement and returns its value
+Value *eval_if(Value *expr, Frame *frame){
+    if(!isNull(cdr(expr)) && !isNull(cdr(cdr(expr)))){
+        Value *cond = eval(car(cdr(expr)), frame);
+        if(cond->type == BOOL_TYPE){
+            if(strcmp(eval(car(cdr(expr)), frame)->s, "#t") != 0){
+                if(!isNull(cdr(cdr(cdr(expr))))){
+                    return eval(car(cdr(cdr(cdr(expr)))), frame);
+                } else{
+                    printf("No false case found in if statement\n");
+                    texit(1);
+                }
+            }
+        }
+        return eval(car(cdr(cdr(expr))), frame);
+    }
+    printf("Incorrect number of args in 'if'\n");
+    texit(1);
+    return makeNull();
+}
+
+//Evaluates a let expression and returns its value
+Value *eval_let(Value *expr, Frame *frame){
+    if(!isNull(cdr(expr)) && !isNull(cdr(cdr(expr)))){
+        /*bind variables*/
+        Frame *child = talloc(sizeof(Frame));
+        child->parent = frame;
+        child->hasParent = 1;
+        child->bindings = makeNull();
+        Value *formals = car(cdr(expr));
+        while(!isNull(formals)){
+            Value *variable = car(formals);
+            if(isNull(variable)){
+                printf("Error: empty pair in let expression\n");
+                texit(1);
+            }
+            formals = cdr(formals);
+            Value *current = child->bindings;
+            while(!isNull(current)){
+                Value *val = car(current);
+                current = cdr(current);
+                if(strcmp(car(variable)->s,car(val)->s) == 0){
+                    printf("Duplicate identifier in 'let': %s\n",car(val)->s);
+                    texit(1);
+                }
+            }
+            child->bindings = cons(variable, child->bindings);
+        }
+        /*evaluate multiple body expressions in let*/
+        Value *body = cdr(cdr(expr));
+        Value *result = eval(car(body), child);
+        body = cdr(body);
+        while(!isNull(body)){
+            result = eval(car(body), child);
+            body = cdr(body);
+        }
+        return result;
+    }
+    printf("Incorrect number of args in 'let'\n");
+    texit(1);
+    return makeNull();
+}
+
+//Evaluates a define expression and returns a VOID_TYPE
+Value *eval_define(Value *expr, Frame *frame){
+    if(!isNull(cdr(expr)) && !isNull(cdr(cdr(expr)))){
+        Value *variable = cdr(expr);
+        frame->bindings = cons(variable, frame->bindings);
+        Value *v = talloc(sizeof(Value));
+        v->type = VOID_TYPE;
+        return v;
+    }
+    printf("Incorrect number of args in 'define'\n");
+    texit(1);
+    return makeNull();
+}
+
+//Evaluates a lambda expression and returns a closure
+Value *eval_lambda(Value *expr, Frame *frame){
+    if(!isNull(cdr(expr)) && !isNull(cdr(cdr(expr)))){
+        Value *closure = talloc(sizeof(Value));
+        closure->type = CLOSURE_TYPE;
+        closure->clo.params = car(cdr(expr));
+        closure->clo.body = cdr(cdr(expr));
+        closure->clo.frame = frame;
+        return closure;
+    }
+    printf("Incorrect number of args in 'lambda'\n");
+    texit(1);
+    return makeNull();
+}
+
+//Evaluates an expression
 Value *eval(Value *expr, Frame *frame){
 	if(expr->type == INT_TYPE || expr->type == DOUBLE_TYPE
 	   || expr->type == STR_TYPE || expr->type == BOOL_TYPE){
 		return expr;
 	}
     if(expr->type == SYMBOL_TYPE){
-        if(isNull(frame->bindings)){
-            printf("Evaluation error: \"%s\" is not a valid symbol\n", expr->s);
-            texit(1);
-        }
-        else{
-            /*loop through bindings, then parent, error if not in bindings*/
-            Value *current = frame->bindings;
-            while(!isNull(current)){
-                Value *val = car(current);
-                current = cdr(current);
-                if(strcmp(car(val)->s,expr->s) == 0){
-                    return eval(car(cdr(val)), frame);
-                }
-                if(isNull(current) && frame->hasParent){
-                    frame = frame->parent;
-                    current = frame->bindings;
-                }
-            }
-        }
+        return eval_symbol(expr, frame);
     }
 	if(expr->type == CONS_TYPE){
 		if(strcmp(car(expr)->s, "quote") == 0){
-            if(!isNull(cdr(expr))){
-                if(isNull(car(cdr(expr)))){
-                    return cdr(expr);
-                } else{
-                    return car(cdr(expr));
-                }
-            } else{
-                printf("Incorrect number of args in 'quote'\n");
-                texit(1);
-            }
+            return eval_quote(expr, frame);
 		}
 		if(strcmp(car(expr)->s, "if") == 0){
-            if(!isNull(cdr(expr)) && !isNull(cdr(cdr(expr)))){
-                Value *cond = eval(car(cdr(expr)), frame);
-                if(cond->type == BOOL_TYPE){
-                    if(strcmp(eval(car(cdr(expr)), frame)->s, "#t") != 0){
-                        if(!isNull(cdr(cdr(cdr(expr))))){
-                            return eval(car(cdr(cdr(cdr(expr)))), frame);
-                        } else{
-                            printf("No false case found in if statement\n");
-                            texit(1);
-                        }
-        			}
-                }
-    			return eval(car(cdr(cdr(expr))), frame);
-            } else{
-                printf("Incorrect number of args in 'if'\n");
-                texit(1);
-            }
+            return eval_if(expr, frame);
 		}
         if(strcmp(car(expr)->s, "let") == 0){
-            if(!isNull(cdr(cdr(expr)))){
-                /*bind variables*/
-                Frame *child = talloc(sizeof(Frame));
-                child->parent = frame;
-                child->hasParent = 1;
-                child->bindings = makeNull();
-                Value *formals = car(cdr(expr));
-                while(!isNull(formals)){
-                    Value *variable = car(formals);
-                    if(isNull(variable)){
-                        printf("Error: empty pair in let expression\n");
-                        texit(1);
-                    }
-                    formals = cdr(formals);
-                    Value *current = child->bindings;
-                    while(!isNull(current)){
-                        Value *val = car(current);
-                        current = cdr(current);
-                        if(strcmp(car(variable)->s,car(val)->s) == 0){
-                            printf("let: duplicate identifier: %s\n",car(val)->s);
-                            texit(1);
-                        }
-                    }
-                    child->bindings = cons(variable, child->bindings);
-                }
-                /*evaluate multiple body expressions in let*/
-                Value *body = cdr(cdr(expr));
-                Value *result = eval(car(body), child);
-                body = cdr(body);
-                while(!isNull(body)){
-                    result = eval(car(body), child);
-                    body = cdr(body);
-                }
-                return result;
-            } else{
-                printf("Incorrect number of args in 'let'\n");
-                texit(1);
-            }
+            return eval_let(expr, frame);
         }
         if(strcmp(car(expr)->s, "define") == 0){
-            Value *variable = cdr(expr);
-            frame->bindings = cons(variable, frame->bindings);
-            Value *v = talloc(sizeof(Value));
-            v->type = VOID_TYPE;
-            return v;
+            return eval_define(expr, frame);
         }
         if(strcmp(car(expr)->s, "lambda") == 0){
-            Value *closure = talloc(sizeof(Value));
-            closure->type = CLOSURE_TYPE;
-            closure->clo.params = car(cdr(expr));
-            closure->clo.body = cdr(cdr(expr));
-            closure->clo.frame = frame;
-            return closure;
+            return eval_lambda(expr, frame);
         }
         Value *values = eval_combination(expr, frame);
         return apply(car(values), cdr(values));
