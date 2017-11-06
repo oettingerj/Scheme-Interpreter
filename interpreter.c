@@ -151,7 +151,7 @@ Value *eval(Value *expr, Frame *frame){
     }
 	if(expr->type == CONS_TYPE){
 		if(strcmp(car(expr)->s, "quote") == 0){
-            if(!isNull(car(cdr(expr)))){
+            if(!isNull(cdr(expr))){
                 return car(cdr(expr));
             } else{
                 printf("Incorrect number of args in 'quote'\n");
