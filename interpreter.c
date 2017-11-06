@@ -106,6 +106,9 @@ Value *apply(Value *function, Value *args){
     }
 }
 
+/*
+    Evaluates a list of expressions and returns a list of those evaluated exprs
+*/
 Value *eval_combination(Value *expr, Frame *frame){
     Value *values = makeNull();
     while(!isNull(expr)){
