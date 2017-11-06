@@ -1,0 +1,6 @@
+(define foo1
+  (let ((c 3))
+  (lambda (a)
+    (lambda (b)
+          (quote (a b c) )))))
+((foo1 3 ) 4)
