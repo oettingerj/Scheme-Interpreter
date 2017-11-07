@@ -50,18 +50,38 @@ void printValue(Value *v){
     }
 }
 
+/*Bind a primitive function */
+void bind(char *name, Value *(*function)(Value *), Frame *frame){
+   Value *value = makeNull();
+   value->type = PRIMITIVE_TYPE;
+   value->pf = function;
+   Value *variable = makeNull();
+   variable->type = SYMBOL_TYPE;
+   variable->s = name;
+   Value *bound = cons(variable, value)
+   frame->bindings = cons(bound, frame->bindings);
+}
+
+/*Add*/
+primitiveIsNull
+
 //Takes a list of s-expressions, calls eval on them, and prints results
 void interpret(Value *tree){
 	Frame *parent = talloc(sizeof(Frame));
 	parent->bindings = makeNull();
-    parent->hasParent = 0;
+        parent->hasParent = 0;
+	/*bind("+",primitiveAdd,parent);
+	bind("null?", primitiveIsNull,parent);
+        bind("car", primitiveCar, parent);
+	bind("cdr", primitiveCdr, parent);
+	brind("cons", primitiveCons, parent);*/
 	while(!isNull(tree)){
 		Value *cur = car(tree);
-        Value *result = eval(cur, parent);
+                Value *result = eval(cur, parent);
 		printValue(result);
-        if(result->type != VOID_TYPE){
-            printf("\n");
-        }
+                if(result->type != VOID_TYPE){
+                   printf("\n");
+                }
 		tree = cdr(tree);
 	}
 }
@@ -96,6 +116,8 @@ Value *apply(Value *function, Value *args){
             body = cdr(body);
         }
         return result;
+    } else if{
+        return (function->pf)(args);
     } else{
         return makeNull();
     }
