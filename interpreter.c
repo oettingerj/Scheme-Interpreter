@@ -68,7 +68,7 @@ For right now, everything's a float*/
 Value * primitiveAdd(Value *args){
 	if(args->type == NULL_TYPE){
 		Value *ret = talloc(sizeof(Value));
-		ret->type = DOUBLE_TYPE;
+		ret->type = INT_TYPE;
 		ret->d = 0;
 		return ret;
 	}
@@ -76,10 +76,21 @@ Value * primitiveAdd(Value *args){
 		Value *val = car(args);
 		Value *ret = primitiveAdd(cdr(args));
 		if(val->type == INT_TYPE){
-			ret->d = ret->d + val->i;
+            if(ret->type == INT_TYPE){
+                ret->i = ret->i + val->i;
+            }
+            else{
+                ret->d = ret->d + val->i;
+            }
 		}
 		else if(val->type == DOUBLE_TYPE){
-			ret->d = ret->d + val->d;
+            if(ret->type == INT_TYPE){
+                ret->type = DOUBLE_TYPE;
+                ret->d = ret->i + val->d;
+            }
+            else{
+                ret->d = ret->d + val->d;
+            }
 		}
 		else{
 			printf("Invalid argument type\n");
