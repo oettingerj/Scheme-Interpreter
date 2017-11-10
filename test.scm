@@ -1,13 +1,13 @@
 (define not
   (lambda (bool)
     (if bool #f #t)))
-    
+
 (define tofu
   (lambda (cond conseq alt)
     (let ((nconseq (not conseq))
           (nalt (not alt)))
       (if cond nconseq nalt))))
-    
+
 (tofu 23 #f #t)
 
-(quote 5)
+(+ 5 6)

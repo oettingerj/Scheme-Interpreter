@@ -147,7 +147,7 @@ Value *primitiveCdr(Value *args){
     }
     return makeNull();
 }
-               
+
 /*cons*/
 Value *primitiveCons(Value *args){
     if(length(args) != 2){
@@ -166,10 +166,10 @@ Value *primitiveCons(Value *args){
 void interpret(Value *tree){
 	Frame *parent = talloc(sizeof(Frame));
 	parent->bindings = makeNull();
-        parent->hasParent = 0;
+    parent->hasParent = 0;
     printValue(parent->bindings);
-	bind("+",primitiveAdd,parent);
-	bind("null?", primitiveIsNull,parent);
+	bind("+", primitiveAdd, parent);
+	bind("null?", primitiveIsNull, parent);
     bind("car", primitiveCar, parent);
 	bind("cdr", primitiveCdr, parent);
 	bind("cons", primitiveCons, parent);
@@ -177,9 +177,9 @@ void interpret(Value *tree){
 		Value *cur = car(tree);
 		Value *result = eval(cur, parent);
 		printValue(result);
-                if(result->type != VOID_TYPE){
-                   printf("\n");
-                }
+        if(result->type != VOID_TYPE){
+            printf("\n");
+        }
 		tree = cdr(tree);
 	}
 }
@@ -386,7 +386,7 @@ Value *eval(Value *expr, Frame *frame){
         if(strcmp(car(expr)->s, "lambda") == 0){
             return eval_lambda(expr, frame);
         }
-	Value *values = eval_combination(expr, frame);
+	    Value *values = eval_combination(expr, frame);
         return apply(car(values), cdr(values));
 	}
     printf("Error: invalid expression\n");
