@@ -34,7 +34,7 @@ struct Value {
           struct Value *body;
           struct Frame *frame;
       } clo;
-      stuct Value *(*pf)(struct Value *);
+      struct Value *(*pf)(struct Value *);
    };
 };
 

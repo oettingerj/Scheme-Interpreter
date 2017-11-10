@@ -31,6 +31,7 @@ void printValue(Value *v){
             printf("%s", v->s);
             break;
         case CLOSURE_TYPE:
+        case PRIMITIVE_TYPE:
             printf("[procedure]");
             break;
         case CONS_TYPE:
@@ -58,26 +59,112 @@ void bind(char *name, Value *(*function)(Value *), Frame *frame){
    Value *variable = makeNull();
    variable->type = SYMBOL_TYPE;
    variable->s = name;
-   Value *bound = cons(variable, value)
+   Value *bound = cons(variable, cons(value, makeNull()));
    frame->bindings = cons(bound, frame->bindings);
 }
 
-/*Add*/
-primitiveIsNull
+/*Add
+For right now, everything's a float*/
+Value * primitiveAdd(Value *args){
+	if(args->type == NULL_TYPE){
+		Value *ret = talloc(sizeof(Value));
+		ret->type = DOUBLE_TYPE;
+		ret->d = 0;
+		return ret;
+	}
+	if(args->type == CONS_TYPE){
+		Value *val = car(args);
+		Value *ret = primitiveAdd(cdr(args));
+		if(val->type == INT_TYPE){
+			ret->d = ret->d + val->i;
+		}
+		else if(val->type == DOUBLE_TYPE){
+			ret->d = ret->d + val->d;
+		}
+		else{
+			printf("Invalid argument type\n");
+            texit(1);
+		}
+		return ret;
+	}
+	else{
+		printf("Invalid argument type\n");
+        texit(1);
+	}
+    return makeNull();
+}
+
+/*null?*/
+Value *primitiveIsNull(Value *args){
+    Value *val = talloc(sizeof(Value));
+    val->type = BOOL_TYPE;
+    if(length(args) != 1){
+        printf("null? takes exactly one argument\n");
+        texit(1);
+    }
+    else{
+        if(isNull(car(args))){
+            val->s = "#t";
+        }
+        else{
+            val->s = "#f";
+        }
+    }
+    return val;
+}
+
+/*car*/
+Value *primitiveCar(Value *args){
+    if(length(args) != 1){
+        printf("car takes exactly one argument\n");
+        texit(1);
+    }
+    else{
+        return(car(car(args)));
+    }
+    return makeNull();
+}
+
+/*cdr*/
+Value *primitiveCdr(Value *args){
+    if(length(args) != 1){
+        printf("cdr takes exactly one argument\n");
+        texit(1);
+    }
+    else{
+        return(cdr(car(args)));
+    }
+    return makeNull();
+}
+               
+/*cons*/
+Value *primitiveCons(Value *args){
+    if(length(args) != 2){
+        printf("cons takes exactly two arguments\n");
+        texit(1);
+    }
+    else{
+        printValue(args);
+        return(cons(car(args), car(cdr(args))));
+    }
+    return makeNull();
+}
+
 
 //Takes a list of s-expressions, calls eval on them, and prints results
 void interpret(Value *tree){
 	Frame *parent = talloc(sizeof(Frame));
 	parent->bindings = makeNull();
         parent->hasParent = 0;
-	/*bind("+",primitiveAdd,parent);
+    printValue(parent->bindings);
+	bind("+",primitiveAdd,parent);
 	bind("null?", primitiveIsNull,parent);
-        bind("car", primitiveCar, parent);
+    bind("car", primitiveCar, parent);
 	bind("cdr", primitiveCdr, parent);
-	brind("cons", primitiveCons, parent);*/
+	bind("cons", primitiveCons, parent);
 	while(!isNull(tree)){
 		Value *cur = car(tree);
-                Value *result = eval(cur, parent);
+		Value *result = eval(cur, parent);
 		printValue(result);
                 if(result->type != VOID_TYPE){
                    printf("\n");
@@ -116,7 +203,7 @@ Value *apply(Value *function, Value *args){
             body = cdr(body);
         }
         return result;
-    } else if{
+    } else if(function->type == PRIMITIVE_TYPE){
         return (function->pf)(args);
     } else{
         return makeNull();
@@ -130,7 +217,7 @@ Value *apply(Value *function, Value *args){
 Value *eval_combination(Value *expr, Frame *frame){
     Value *values = makeNull();
     while(!isNull(expr)){
-        values = cons(eval(car(expr), frame), values);
+	values = cons(eval(car(expr), frame), values);
         expr = cdr(expr);
     }
     values = reverse(values);
@@ -266,7 +353,7 @@ Value *eval_lambda(Value *expr, Frame *frame){
 //Evaluates an expression
 Value *eval(Value *expr, Frame *frame){
 	if(expr->type == INT_TYPE || expr->type == DOUBLE_TYPE
-	   || expr->type == STR_TYPE || expr->type == BOOL_TYPE){
+	   || expr->type == STR_TYPE || expr->type == BOOL_TYPE || expr->type == PRIMITIVE_TYPE){
 		return expr;
 	}
     if(expr->type == SYMBOL_TYPE){
@@ -288,10 +375,10 @@ Value *eval(Value *expr, Frame *frame){
         if(strcmp(car(expr)->s, "lambda") == 0){
             return eval_lambda(expr, frame);
         }
-        Value *values = eval_combination(expr, frame);
+	Value *values = eval_combination(expr, frame);
         return apply(car(values), cdr(values));
 	}
-    printf("Error: invalid expression");
+    printf("Error: invalid expression\n");
     texit(1);
     return makeNull();
 }
