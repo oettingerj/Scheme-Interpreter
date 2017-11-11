@@ -155,8 +155,7 @@ Value *primitiveCons(Value *args){
         texit(1);
     }
     else{
-        printValue(args);
-        return(cons(car(args), car(cdr(args))));
+        return(cons(car(args), cdr(args)));
     }
     return makeNull();
 }
@@ -389,11 +388,6 @@ Value *eval(Value *expr, Frame *frame){
 	    Value *values = eval_combination(expr, frame);
         return apply(car(values), cdr(values));
 	}
-    if(expr->type == PRIMITIVE_TYPE){
-        printf("here");
-        Value *values = eval_combination(expr, frame);
-        return apply(car(values), cdr(values));
-    }
     printf("Error: invalid expression\n");
     texit(1);
     return makeNull();

@@ -1,5 +1,6 @@
 (+ 5 6)
 (null? (quote ()))
-;(cons 5 6)
+(cons 5 6)
 (car (quote (5 6)))
 (cdr (quote (5 6)))
+(cdr (quote (6)))
