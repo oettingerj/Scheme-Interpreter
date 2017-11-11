@@ -261,11 +261,7 @@ Value *eval_symbol(Value *expr, Frame *frame){
 //Evaluates a quote expression and returns its value
 Value *eval_quote(Value *expr, Frame *frame){
     if(!isNull(cdr(expr))){
-        if(isNull(car(cdr(expr)))){
-            return cdr(expr);
-        } else{
-            return car(cdr(expr));
-        }
+        return car(cdr(expr));
     }
     printf("Incorrect number of args in 'quote'\n");
     texit(1);

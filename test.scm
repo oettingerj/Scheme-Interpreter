@@ -1,4 +1,7 @@
-(cdr (quote (6)))
+(cons 1 (cons 2 (cons 3 (quote ()))))
+(quote ())
+(quote (4 5 6))
+
 
 (define length
   (lambda (lst)
