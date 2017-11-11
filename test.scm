@@ -1,6 +1,26 @@
-(+ 5 6)
-(null? (quote ()))
-(cons 5 6)
-(car (quote (5 6)))
-(cdr (quote (5 6)))
-(cdr (quote (6)))
+(define length
+  (lambda (lst)
+    (if (null? lst)
+        0
+        (+ 1 (length (cdr lst))))))
+
+(length (quote ()))
+(length (quote (4 5 6)))
+
+(define append
+  (lambda (lst1 lst2)
+    (if (null? lst1)
+        lst2
+        (cons (car lst1) (append (cdr lst1) lst2)))))
+
+(append (quote (4 5)) (quote (6 7)))
+
+(define reverse
+  (lambda (lst)
+    (if (null? lst)
+        lst
+        (append (reverse (cdr lst)) (cons (car lst) (quote ()))))))
+
+(reverse (quote ()))
+(reverse (quote (1 2 3 4)))
+(reverse (quote (("computer" "science") "is" "awesome")))

@@ -31,6 +31,8 @@ void printValue(Value *v){
             printf("%s", v->s);
             break;
         case CLOSURE_TYPE:
+            printf("[procedure]");
+            break;
         case PRIMITIVE_TYPE:
             printf("[procedure]");
             break;
@@ -370,7 +372,7 @@ Value *eval(Value *expr, Frame *frame){
         return eval_symbol(expr, frame);
     }
 	if(expr->type == CONS_TYPE){
-		if(strcmp(car(expr)->s, "quote") == 0){
+        if(strcmp(car(expr)->s, "quote") == 0){
             return eval_quote(expr, frame);
 		}
 		if(strcmp(car(expr)->s, "if") == 0){
