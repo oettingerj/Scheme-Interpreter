@@ -53,10 +53,10 @@ void printValue(Value *v){
 
 /*Bind a primitive function */
 void bind(char *name, Value *(*function)(Value *), Frame *frame){
-   Value *value = makeNull();
+   Value *value = talloc(sizeof(Value));
    value->type = PRIMITIVE_TYPE;
    value->pf = function;
-   Value *variable = makeNull();
+   Value *variable = talloc(sizeof(Value));
    variable->type = SYMBOL_TYPE;
    variable->s = name;
    Value *bound = cons(variable, cons(value, makeNull()));
@@ -114,7 +114,7 @@ Value *primitiveIsNull(Value *args){
         texit(1);
     }
     else{
-        if(isNull(car(args))){
+        if(isNull(car(car(args)))){
             val->s = "#t";
         }
         else{
@@ -389,6 +389,11 @@ Value *eval(Value *expr, Frame *frame){
 	    Value *values = eval_combination(expr, frame);
         return apply(car(values), cdr(values));
 	}
+    if(expr->type == PRIMITIVE_TYPE){
+        printf("here");
+        Value *values = eval_combination(expr, frame);
+        return apply(car(values), cdr(values));
+    }
     printf("Error: invalid expression\n");
     texit(1);
     return makeNull();
