@@ -1,3 +1,5 @@
+(cdr (quote (6)))
+
 (define length
   (lambda (lst)
     (if (null? lst)

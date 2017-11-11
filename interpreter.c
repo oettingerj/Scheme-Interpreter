@@ -48,6 +48,9 @@ void printValue(Value *v){
             }
             printf(")");
             break;
+        case NULL_TYPE:
+            printf("()");
+            break;
         default:
             break;
     }
@@ -133,7 +136,7 @@ Value *primitiveCar(Value *args){
         texit(1);
     }
     else{
-        return(car(car(args)));
+        return car(car(args));
     }
     return makeNull();
 }
@@ -145,7 +148,7 @@ Value *primitiveCdr(Value *args){
         texit(1);
     }
     else{
-        return(cdr(car(args)));
+        return cdr(car(args));
     }
     return makeNull();
 }
@@ -157,9 +160,9 @@ Value *primitiveCons(Value *args){
         texit(1);
     }
     else{
-        return(cons(car(args), cdr(args)));
+        return cons(car(args), cdr(args));
     }
-    return makeNull();
+    return cons(makeNull(), makeNull());
 }
 
 
@@ -168,7 +171,6 @@ void interpret(Value *tree){
 	Frame *parent = talloc(sizeof(Frame));
 	parent->bindings = makeNull();
     parent->hasParent = 0;
-    printValue(parent->bindings);
 	bind("+", primitiveAdd, parent);
 	bind("null?", primitiveIsNull, parent);
     bind("car", primitiveCar, parent);
