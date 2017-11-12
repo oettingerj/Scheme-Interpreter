@@ -37,16 +37,7 @@ void printValue(Value *v){
             printf("[procedure]");
             break;
         case CONS_TYPE:
-            printf("(");
-            Value *cur = v;
-            while(!isNull(cur)){
-                printValue(car(cur));
-                if(!isNull(cdr(cur))){
-                    printf(" ");
-                }
-                cur = cdr(cur);
-            }
-            printf(")");
+            printCons(v);
             break;
         case NULL_TYPE:
             printf("()");
@@ -54,6 +45,40 @@ void printValue(Value *v){
         default:
             break;
     }
+}
+
+//Prints a cons list
+void printCons(Value *v){
+    printf("(");
+    Value *cur = v;
+    while(!isNull(cur)){
+        /*if(car(cur)->type == CONS_TYPE){
+            printValue(car(car(cur)));
+            printValue(cdr(cur));
+            cur = cdr(cur);
+        } else if(!isNull(cdr(cur)) && car(cdr(cur))->type != CONS_TYPE){
+            printValue(car(cur));
+            printf(".");
+        } else{
+            printValue(car(cur));
+        }*/
+        if(car(cur)->type == CONS_TYPE){
+            printValue(car(car(cur)));
+            cur = (cdr(car(cur)));
+        } else{
+            if(!isNull(car(cur))){
+                printValue(car(cur));
+            }
+            cur = cdr(cur);
+        }
+        if(!isNull(cur) && !isNull(car(cur))){
+            printf(" ");
+            if(car(cur)->type != CONS_TYPE){
+                printf(". ");
+            }
+        }
+    }
+    printf(")");
 }
 
 /*Bind a primitive function */
