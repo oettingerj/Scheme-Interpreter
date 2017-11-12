@@ -1,7 +1,7 @@
 /*
-    interpreter.c
-    Nathaniel Lovin, Josh Oettinger, Tenzin Dolphen
-*/
+ interpreter.c
+ Nathaniel Lovin, Josh Oettinger, Tenzin Dolphen
+ */
 
 #include <stdio.h>
 #include <string.h>
@@ -58,37 +58,37 @@ void printValue(Value *v){
 
 /*Bind a primitive function */
 void bind(char *name, Value *(*function)(Value *), Frame *frame){
-   Value *value = talloc(sizeof(Value));
-   value->type = PRIMITIVE_TYPE;
-   value->pf = function;
-   Value *variable = talloc(sizeof(Value));
-   variable->type = SYMBOL_TYPE;
-   variable->s = name;
-   Value *bound = cons(variable, cons(value, makeNull()));
-   frame->bindings = cons(bound, frame->bindings);
+    Value *value = talloc(sizeof(Value));
+    value->type = PRIMITIVE_TYPE;
+    value->pf = function;
+    Value *variable = talloc(sizeof(Value));
+    variable->type = SYMBOL_TYPE;
+    variable->s = name;
+    Value *bound = cons(variable, cons(value, makeNull()));
+    frame->bindings = cons(bound, frame->bindings);
 }
 
 /*Add
-For right now, everything's a float*/
+ For right now, everything's a float*/
 Value * primitiveAdd(Value *args){
-	if(args->type == NULL_TYPE){
-		Value *ret = talloc(sizeof(Value));
-		ret->type = INT_TYPE;
-		ret->d = 0;
-		return ret;
-	}
-	if(args->type == CONS_TYPE){
-		Value *val = car(args);
-		Value *ret = primitiveAdd(cdr(args));
-		if(val->type == INT_TYPE){
+    if(args->type == NULL_TYPE){
+        Value *ret = talloc(sizeof(Value));
+        ret->type = INT_TYPE;
+        ret->d = 0;
+        return ret;
+    }
+    if(args->type == CONS_TYPE){
+        Value *val = car(args);
+        Value *ret = primitiveAdd(cdr(args));
+        if(val->type == INT_TYPE){
             if(ret->type == INT_TYPE){
                 ret->i = ret->i + val->i;
             }
             else{
                 ret->d = ret->d + val->i;
             }
-		}
-		else if(val->type == DOUBLE_TYPE){
+        }
+        else if(val->type == DOUBLE_TYPE){
             if(ret->type == INT_TYPE){
                 ret->type = DOUBLE_TYPE;
                 ret->d = ret->i + val->d;
@@ -96,17 +96,17 @@ Value * primitiveAdd(Value *args){
             else{
                 ret->d = ret->d + val->d;
             }
-		}
-		else{
-			printf("Invalid argument type\n");
+        }
+        else{
+            printf("Invalid argument type\n");
             texit(1);
-		}
-		return ret;
-	}
-	else{
-		printf("Invalid argument type\n");
+        }
+        return ret;
+    }
+    else{
+        printf("Invalid argument type\n");
         texit(1);
-	}
+    }
     return makeNull();
 }
 
@@ -119,7 +119,7 @@ Value *primitiveIsNull(Value *args){
         texit(1);
     }
     else{
-        if(isNull(car(car(args)))){
+        if(isNull(car(args))){
             val->s = "#t";
         }
         else{
@@ -168,23 +168,23 @@ Value *primitiveCons(Value *args){
 
 //Takes a list of s-expressions, calls eval on them, and prints results
 void interpret(Value *tree){
-	Frame *parent = talloc(sizeof(Frame));
-	parent->bindings = makeNull();
+    Frame *parent = talloc(sizeof(Frame));
+    parent->bindings = makeNull();
     parent->hasParent = 0;
-	bind("+", primitiveAdd, parent);
-	bind("null?", primitiveIsNull, parent);
+    bind("+", primitiveAdd, parent);
+    bind("null?", primitiveIsNull, parent);
     bind("car", primitiveCar, parent);
-	bind("cdr", primitiveCdr, parent);
-	bind("cons", primitiveCons, parent);
-	while(!isNull(tree)){
-		Value *cur = car(tree);
-		Value *result = eval(cur, parent);
-		printValue(result);
+    bind("cdr", primitiveCdr, parent);
+    bind("cons", primitiveCons, parent);
+    while(!isNull(tree)){
+        Value *cur = car(tree);
+        Value *result = eval(cur, parent);
+        printValue(result);
         if(result->type != VOID_TYPE){
             printf("\n");
         }
-		tree = cdr(tree);
-	}
+        tree = cdr(tree);
+    }
 }
 
 //Applies a function to its args
@@ -208,7 +208,7 @@ Value *apply(Value *function, Value *args){
                 formal = cdr(formal);
             }
         }
-
+        
         Value *body = function->clo.body;
         Value *result = eval(car(body), child);
         body = cdr(body);
@@ -225,13 +225,13 @@ Value *apply(Value *function, Value *args){
 }
 
 /*
-    Evaluates a list of expressions and returns a list of
-    those evaluated expressions
-*/
+ Evaluates a list of expressions and returns a list of
+ those evaluated expressions
+ */
 Value *eval_combination(Value *expr, Frame *frame){
     Value *values = makeNull();
     while(!isNull(expr)){
-	values = cons(eval(car(expr), frame), values);
+        values = cons(eval(car(expr), frame), values);
         expr = cdr(expr);
     }
     values = reverse(values);
@@ -362,20 +362,20 @@ Value *eval_lambda(Value *expr, Frame *frame){
 
 //Evaluates an expression
 Value *eval(Value *expr, Frame *frame){
-	if(expr->type == INT_TYPE || expr->type == DOUBLE_TYPE
-	   || expr->type == STR_TYPE || expr->type == BOOL_TYPE || expr->type == PRIMITIVE_TYPE){
-		return expr;
-	}
+    if(expr->type == INT_TYPE || expr->type == DOUBLE_TYPE
+       || expr->type == STR_TYPE || expr->type == BOOL_TYPE || expr->type == PRIMITIVE_TYPE || expr->type == NULL_TYPE){
+        return expr;
+    }
     if(expr->type == SYMBOL_TYPE){
         return eval_symbol(expr, frame);
     }
-	if(expr->type == CONS_TYPE){
+    if(expr->type == CONS_TYPE){
         if(strcmp(car(expr)->s, "quote") == 0){
             return eval_quote(expr, frame);
-		}
-		if(strcmp(car(expr)->s, "if") == 0){
+        }
+        if(strcmp(car(expr)->s, "if") == 0){
             return eval_if(expr, frame);
-		}
+        }
         if(strcmp(car(expr)->s, "let") == 0){
             return eval_let(expr, frame);
         }
@@ -385,9 +385,9 @@ Value *eval(Value *expr, Frame *frame){
         if(strcmp(car(expr)->s, "lambda") == 0){
             return eval_lambda(expr, frame);
         }
-	    Value *values = eval_combination(expr, frame);
+        Value *values = eval_combination(expr, frame);
         return apply(car(values), cdr(values));
-	}
+    }
     printf("Error: invalid expression\n");
     texit(1);
     return makeNull();

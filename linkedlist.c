@@ -35,7 +35,7 @@ Value *cons(Value *car, Value *cdr) {
  * (Uses assertions to ensure that this is a legitimate operation.)
  */
 bool isNull(Value *value) {
-	if (value->type == NULL_TYPE){
+    if (value->type == NULL_TYPE){
 		return true;
 	}
 	return false;
