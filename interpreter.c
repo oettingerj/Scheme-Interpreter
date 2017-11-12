@@ -52,8 +52,18 @@ void printCons(Value *v){
     printf("(");
     Value *cur = v;
     while(!isNull(cur)){
-        if(car(cur)->type == CONS_TYPE){
-            printValue(car(car(cur)));
+        if(cur->type != CONS_TYPE){
+            printf(" . ");
+            printValue(cur);
+            cur = makeNull();
+        }
+        else{
+            printValue(car(cur));
+            printf(" ");
+            cur = cdr(cur);
+        }
+        /*if(car(cur)->type == CONS_TYPE){
+            printValue(car(cur));
             if(car(cdr(car(cur)))->type == CONS_TYPE){
                 cur = cdr(car(cur));
             } else{
@@ -72,7 +82,7 @@ void printCons(Value *v){
             if(cdr(cur)->type != CONS_TYPE){
                 printf(". ");
             }
-        }
+        }*/
     }
     printf(")");
 }
