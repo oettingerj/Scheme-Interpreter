@@ -52,19 +52,15 @@ void printCons(Value *v){
     printf("(");
     Value *cur = v;
     while(!isNull(cur)){
-        /*if(car(cur)->type == CONS_TYPE){
-            printValue(car(car(cur)));
-            printValue(cdr(cur));
-            cur = cdr(cur);
-        } else if(!isNull(cdr(cur)) && car(cdr(cur))->type != CONS_TYPE){
-            printValue(car(cur));
-            printf(".");
-        } else{
-            printValue(car(cur));
-        }*/
         if(car(cur)->type == CONS_TYPE){
             printValue(car(car(cur)));
-            cur = (cdr(car(cur)));
+            if(car(cdr(car(cur)))->type == CONS_TYPE){
+                cur = cdr(car(cur));
+            } else{
+                printf(" . ");
+                printValue(car(cdr(car(cur))));
+                cur = cdr(cur);
+            }
         } else{
             if(!isNull(car(cur))){
                 printValue(car(cur));
@@ -73,7 +69,7 @@ void printCons(Value *v){
         }
         if(!isNull(cur) && !isNull(car(cur))){
             printf(" ");
-            if(car(cur)->type != CONS_TYPE){
+            if(cdr(cur)->type != CONS_TYPE){
                 printf(". ");
             }
         }
@@ -185,7 +181,7 @@ Value *primitiveCons(Value *args){
         texit(1);
     }
     else{
-        return cons(car(args), cdr(args));
+        return cons(car(args), car(cdr(args)));
     }
     return cons(makeNull(), makeNull());
 }
