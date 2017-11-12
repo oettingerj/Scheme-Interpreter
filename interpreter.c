@@ -208,7 +208,7 @@ Value *apply(Value *function, Value *args){
                 formal = cdr(formal);
             }
         }
-        
+
         Value *body = function->clo.body;
         Value *result = eval(car(body), child);
         body = cdr(body);
@@ -362,31 +362,36 @@ Value *eval_lambda(Value *expr, Frame *frame){
 
 //Evaluates an expression
 Value *eval(Value *expr, Frame *frame){
-    if(expr->type == INT_TYPE || expr->type == DOUBLE_TYPE
-       || expr->type == STR_TYPE || expr->type == BOOL_TYPE || expr->type == PRIMITIVE_TYPE || expr->type == NULL_TYPE){
+    if(expr->type == INT_TYPE || expr->type == DOUBLE_TYPE ||
+       expr->type == STR_TYPE || expr->type == BOOL_TYPE ||
+       expr->type == PRIMITIVE_TYPE || expr->type == NULL_TYPE){
         return expr;
     }
     if(expr->type == SYMBOL_TYPE){
         return eval_symbol(expr, frame);
     }
     if(expr->type == CONS_TYPE){
-        if(strcmp(car(expr)->s, "quote") == 0){
-            return eval_quote(expr, frame);
+        if(car(expr)->type == SYMBOL_TYPE){
+            if(strcmp(car(expr)->s, "quote") == 0){
+                return eval_quote(expr, frame);
+            }
+            if(strcmp(car(expr)->s, "if") == 0){
+                return eval_if(expr, frame);
+            }
+            if(strcmp(car(expr)->s, "let") == 0){
+                return eval_let(expr, frame);
+            }
+            if(strcmp(car(expr)->s, "define") == 0){
+                return eval_define(expr, frame);
+            }
+            if(strcmp(car(expr)->s, "lambda") == 0){
+                return eval_lambda(expr, frame);
+            }
+            Value *values = eval_combination(expr, frame);
+            return apply(car(values), cdr(values));
+        } else{
+            return expr;
         }
-        if(strcmp(car(expr)->s, "if") == 0){
-            return eval_if(expr, frame);
-        }
-        if(strcmp(car(expr)->s, "let") == 0){
-            return eval_let(expr, frame);
-        }
-        if(strcmp(car(expr)->s, "define") == 0){
-            return eval_define(expr, frame);
-        }
-        if(strcmp(car(expr)->s, "lambda") == 0){
-            return eval_lambda(expr, frame);
-        }
-        Value *values = eval_combination(expr, frame);
-        return apply(car(values), cdr(values));
     }
     printf("Error: invalid expression\n");
     texit(1);
