@@ -79,6 +79,144 @@ void bind(char *name, Value *(*function)(Value *), Frame *frame){
     Value *bound = cons(variable, cons(value, makeNull()));
     frame->bindings = cons(bound, frame->bindings);
 }
+/*primitive div function*/
+Value *primitiveDiv(Value *args){
+    if(length(args) != 2){
+        printf("Division takes exactly two arguments\n");
+        texit(1);
+    }
+    else if(args->type == CONS_TYPE){
+        Value *val = car(args);
+        Value *ret = car(cdr(args));
+        if (ret->i == 0 || ret->d == 0.0000000){
+            printf("zero not allowed as a denominator\n");
+            texit(1);
+        }
+        
+        else if(val->type == INT_TYPE){
+            if(ret->type == INT_TYPE){
+                if (val->i / ret->i == 0){
+                    ret->type = DOUBLE_TYPE;
+                    ret->d = (float)val->i / (float)ret->i;;
+                }
+                else if (val->i % ret->i != 0){
+                    ret->type = DOUBLE_TYPE;
+                    ret->d = (float)((val->i / ret->i) + (float)((float)(val->i % ret->i) / ret->i ));
+                }
+                else{
+                ret->i = val->i / ret->i;
+                }
+            }
+            else {
+                ret->d = val->d / ret->i;
+            }
+            
+        }
+        else if(val->type == DOUBLE_TYPE){
+            if(ret->type == INT_TYPE){
+                ret->type = DOUBLE_TYPE;
+                ret->d = val->d / ret->i;
+            }
+            else{
+                ret->d = val->d / ret->d;
+            }
+        }
+        else{
+            printf("Invalid argument type\n");
+            texit(1);
+        }
+        return ret;
+    }
+    else{
+        printf("Invalid argument type\n");
+        texit(1);
+    }
+    return makeNull();
+}
+/*primitive multpilication function*/
+Value * primitiveMult(Value *args){
+    if(args->type == NULL_TYPE){
+        Value *ret = talloc(sizeof(Value));
+        ret->type = INT_TYPE;
+        ret->i = 1;
+        return ret;
+    }
+    if(args->type == CONS_TYPE){
+        Value *val = car(args);
+        Value *ret = primitiveMult(cdr(args));
+        if(val->type == INT_TYPE){
+            if(ret->type == INT_TYPE){
+                ret->i = ret->i * val->i;
+            }
+            else{
+                ret->d = ret->d * val->i;
+            }
+        }
+        else if(val->type == DOUBLE_TYPE){
+            if(ret->type == INT_TYPE){
+                ret->type = DOUBLE_TYPE;
+                ret->d = ret->i * val->d;
+            }
+            else{
+                ret->d = ret->d * val->d;
+            }
+        }
+        else{
+            printf("Invalid argument type\n");
+            texit(1);
+        }
+        return ret;
+    }
+    else{
+        printf("Invalid argument type\n");
+        texit(1);
+    }
+    return makeNull();
+}
+
+Value * primitiveSub(Value *args){
+    if(length(args) != 2){
+        printf("Substraction takes exactly two arguments\n");
+        texit(1);
+    }
+    if(args->type == NULL_TYPE){
+        Value *ret = talloc(sizeof(Value));
+        ret->type = INT_TYPE;
+        ret->d = 0;
+        return ret;
+    }
+    if(args->type == CONS_TYPE){
+        Value *val = car(args);
+        Value *ret = car(cdr(args));
+        if(val->type == INT_TYPE){
+            if(ret->type == INT_TYPE){
+                ret->i = val->i - ret->i;
+            }
+            else{
+                ret->d = val->i - ret->d;
+            }
+        }
+        else if(val->type == DOUBLE_TYPE){
+            if(ret->type == INT_TYPE){
+                ret->type = DOUBLE_TYPE;
+                ret->d = val->d - ret->i;
+            }
+            else{
+                ret->d = val->d - ret->d;
+            }
+        }
+        else{
+            printf("Invalid argument type\n");
+            texit(1);
+        }
+        return ret;
+    }
+    else{
+        printf("Invalid argument type\n");
+        texit(1);
+    }
+    return makeNull();
+}
 
 /*Add
  For right now, everything's a float*/
@@ -188,6 +326,9 @@ void interpret(Value *tree){
     bind("car", primitiveCar, parent);
     bind("cdr", primitiveCdr, parent);
     bind("cons", primitiveCons, parent);
+    bind("*", primitiveMult, parent);
+    bind("/", primitiveDiv, parent);
+    bind("-", primitiveSub, parent);
     while(!isNull(tree)){
         Value *cur = car(tree);
         Value *result = eval(cur, parent);
