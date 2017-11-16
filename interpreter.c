@@ -92,7 +92,7 @@ Value *primitiveDiv(Value *args){
             printf("zero not allowed as a denominator\n");
             texit(1);
         }
-        
+
         else if(val->type == INT_TYPE){
             if(ret->type == INT_TYPE){
                 if (val->i / ret->i == 0){
@@ -110,7 +110,7 @@ Value *primitiveDiv(Value *args){
             else {
                 ret->d = val->d / ret->i;
             }
-            
+
         }
         else if(val->type == DOUBLE_TYPE){
             if(ret->type == INT_TYPE){
@@ -543,7 +543,7 @@ Value *eval(Value *expr, Frame *frame){
             Value *values = eval_combination(expr, frame);
             return apply(car(values), cdr(values));
         } else{
-            return expr;
+            return car(expr);
         }
     }
     printf("Error: invalid expression\n");
