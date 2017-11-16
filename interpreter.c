@@ -513,6 +513,33 @@ Value *eval_lambda(Value *expr, Frame *frame){
     return makeNull();
 }
 
+//Evaluates a set! expression
+//TODO: Make it search in parent frame if binding not changed
+Value *eval_set(Value *expr, Frame *frame){
+    if(!isNull(cdr(expr)) && !isNull(cdr(cdr(expr)))){
+        Value *newBinding = cdr(expr);
+        Value *newBindings = makeNull();
+        Value *cur = frame->bindings;
+        int bindingFound = 0;
+        while(!isNull(cur)){
+            if(strcmp(car(car(cur))->s, car(newBinding)->s) == 0){
+                newBindings = cons(newBinding, newBindings);
+                bindingFound = 1;
+            } else{
+                newBindings = cons(cur, newBindings);
+            }
+            cur = cdr(cur);
+        }
+        frame->bindings = newBindings;
+        Value *v = talloc(sizeof(Value));
+        v->type = VOID_TYPE;
+        return v;
+    }
+    printf("Incorrect number of args in 'set!'\n");
+    texit(1);
+    return makeNull();
+}
+
 //Evaluates an expression
 Value *eval(Value *expr, Frame *frame){
     if(expr->type == INT_TYPE || expr->type == DOUBLE_TYPE ||
@@ -539,6 +566,9 @@ Value *eval(Value *expr, Frame *frame){
             }
             if(strcmp(car(expr)->s, "lambda") == 0){
                 return eval_lambda(expr, frame);
+            }
+            if(strcmp(car(expr)->s, "set!") == 0){
+                return eval_set(expr, frame);
             }
             Value *values = eval_combination(expr, frame);
             return apply(car(values), cdr(values));
