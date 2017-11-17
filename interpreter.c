@@ -514,7 +514,6 @@ Value *eval_lambda(Value *expr, Frame *frame){
 }
 
 //Evaluates a set! expression
-//TODO: Make it search in parent frame if binding not changed
 Value *eval_set(Value *expr, Frame *frame){
     if(!isNull(cdr(expr)) && !isNull(cdr(cdr(expr)))){
         Value *newBinding = cdr(expr);
@@ -529,6 +528,15 @@ Value *eval_set(Value *expr, Frame *frame){
                 newBindings = cons(cur, newBindings);
             }
             cur = cdr(cur);
+            if(isNull(cur) && bindingFound == 0){
+                if(frame->hasParent){
+                    frame = frame->parent;
+                    cur = frame->bindings;
+                } else{
+                    printf("No binding for '%s'\n", car(newBinding)->s);
+                    texit(1);
+                }
+            }
         }
         frame->bindings = newBindings;
         Value *v = talloc(sizeof(Value));
@@ -558,7 +566,7 @@ Value *eval_and(Value * expr, Frame *frame){
             cur = cdr(cur);
         }
     } else{
-        printf("Incorrect number of args in 'and'");
+        printf("Incorrect number of args in 'and'\n");
         texit(1);
     }
     boolean->s = "#t";
@@ -579,11 +587,45 @@ Value *eval_or(Value * expr, Frame *frame){
             cur = cdr(cur);
         }
     } else{
-        printf("Incorrect number of args in 'and'");
+        printf("Incorrect number of args in 'and'\n");
         texit(1);
     }
     boolean->s = "#f";
     return boolean;
+}
+
+//Evaluates cond expressions
+Value *eval_cond(Value *expr, Frame *frame){
+    if(!isNull(cdr(expr))){
+        Value *cur = cdr(expr);
+        while(!isNull(cur)){
+            Value *testExpr = car(cur);
+            if(testExpr->type == CONS_TYPE && !isNull(cdr(testExpr))){
+                Value *test = eval(car(testExpr), frame);
+                if(test->type == SYMBOL_TYPE && strcmp(test->s, "else") == 0){
+                    if(isNull(cdr(cur))){
+                        return eval(car(cdr(testExpr)), frame);
+                    } else{
+                        printf("Error: else must be in last test-expr pair in cond expression\n");
+                        texit(1);
+                    }
+                }
+                if(!(test->type == BOOL_TYPE && strcmp(test->s, "#f") == 0)){
+                    return eval(car(cdr(testExpr)), frame);
+                }
+            } else{
+                printf("Invalid test-expr pair\n");
+                texit(1);
+            }
+            cur = cdr(cur);
+        }
+    } else{
+        printf("Incorrect number of args in 'cond'\n");
+        texit(1);
+    }
+    Value *voidReturn = talloc(sizeof(Value));
+    voidReturn->type = VOID_TYPE;
+    return voidReturn;
 }
 
 //Evaluates an expression
@@ -594,6 +636,9 @@ Value *eval(Value *expr, Frame *frame){
         return expr;
     }
     if(expr->type == SYMBOL_TYPE){
+        if(strcmp(expr->s, "else") == 0){
+            return expr;
+        }
         return eval_symbol(expr, frame);
     }
     if(expr->type == CONS_TYPE){
@@ -621,6 +666,9 @@ Value *eval(Value *expr, Frame *frame){
             }
             if(strcmp(car(expr)->s, "or") == 0){
                 return eval_or(expr, frame);
+            }
+            if(strcmp(car(expr)->s, "cond") == 0){
+                return eval_cond(expr, frame);
             }
             Value *values = eval_combination(expr, frame);
             return apply(car(values), cdr(values));
