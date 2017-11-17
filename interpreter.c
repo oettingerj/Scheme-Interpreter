@@ -349,17 +349,22 @@ Value *apply(Value *function, Value *args){
         child->hasParent = 1;
         Value *actual = args;
         Value *formal = function->clo.params;
-        while(!isNull(formal)){
-            if(isNull(actual)){
-                printf("Incorrect number of params in function");
-                texit(1);
-            } else{
-                Value *binding = cons(car(formal), cons(car(actual),
-                                                        makeNull()));
-                child->bindings = cons(binding, child->bindings);
-                actual = cdr(actual);
-                formal = cdr(formal);
+        if(formal->type == CONS_TYPE){
+            while(!isNull(formal)){
+                if(isNull(actual)){
+                    printf("Incorrect number of params in function");
+                    texit(1);
+                } else{
+                    Value *binding = cons(car(formal), cons(car(actual),
+                                                            makeNull()));
+                    child->bindings = cons(binding, child->bindings);
+                    actual = cdr(actual);
+                    formal = cdr(formal);
+                }
             }
+        } else{
+            Value *binding = cons(formal, cons(actual, makeNull()));
+            child->bindings = cons(binding, child->bindings);
         }
 
         Value *body = function->clo.body;
@@ -629,6 +634,7 @@ Value *eval_cond(Value *expr, Frame *frame){
 }
 
 //Evaluates an expression
+//TODO: Figure out how to make lists evaluate to lists but have (+) not print as (0)
 Value *eval(Value *expr, Frame *frame){
     if(expr->type == INT_TYPE || expr->type == DOUBLE_TYPE ||
        expr->type == STR_TYPE || expr->type == BOOL_TYPE ||
@@ -673,7 +679,7 @@ Value *eval(Value *expr, Frame *frame){
             Value *values = eval_combination(expr, frame);
             return apply(car(values), cdr(values));
         } else{
-            return car(expr);
+            return expr;
         }
     }
     printf("Error: invalid expression\n");

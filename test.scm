@@ -1,3 +1,3 @@
-(cond (#f 6)
-        (#f 8)
-        (else 9))
+(define plus (lambda y (+ (car y) (car (cdr y)))))
+
+(plus 1 2 3 4 5)
