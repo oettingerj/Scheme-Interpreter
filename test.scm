@@ -1,4 +1,3 @@
-(define x 5)
-x
-(set! x 27)
-x
+(define x (quote (5 6 7)))
+
+(and 6 #t x)

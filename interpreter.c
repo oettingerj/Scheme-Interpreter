@@ -540,6 +540,52 @@ Value *eval_set(Value *expr, Frame *frame){
     return makeNull();
 }
 
+//Evaluates an and expression
+Value *eval_and(Value * expr, Frame *frame){
+    Value *boolean = talloc(sizeof(Value));
+    boolean->type = BOOL_TYPE;
+    if(!isNull(cdr(expr))){
+        Value *cur = cdr(expr);
+        while(!isNull(cur)){
+            Value *val = eval(car(cur), frame);
+            if(val->type == BOOL_TYPE && strcmp(val->s, "#f") == 0){
+                boolean->s = "#f";
+                return boolean;
+            }
+            if(isNull(cdr(cur))){
+                return eval(car(cur), frame);
+            }
+            cur = cdr(cur);
+        }
+    } else{
+        printf("Incorrect number of args in 'and'");
+        texit(1);
+    }
+    boolean->s = "#t";
+    return boolean;
+}
+
+//Evaluates an or expression
+Value *eval_or(Value * expr, Frame *frame){
+    Value *boolean = talloc(sizeof(Value));
+    boolean->type = BOOL_TYPE;
+    if(!isNull(cdr(expr))){
+        Value *cur = cdr(expr);
+        while(!isNull(cur)){
+            Value *val = eval(car(cur), frame);
+            if(!(val->type == BOOL_TYPE && strcmp(val->s, "#f") == 0)){
+                return val;
+            }
+            cur = cdr(cur);
+        }
+    } else{
+        printf("Incorrect number of args in 'and'");
+        texit(1);
+    }
+    boolean->s = "#f";
+    return boolean;
+}
+
 //Evaluates an expression
 Value *eval(Value *expr, Frame *frame){
     if(expr->type == INT_TYPE || expr->type == DOUBLE_TYPE ||
@@ -569,6 +615,12 @@ Value *eval(Value *expr, Frame *frame){
             }
             if(strcmp(car(expr)->s, "set!") == 0){
                 return eval_set(expr, frame);
+            }
+            if(strcmp(car(expr)->s, "and") == 0){
+                return eval_and(expr, frame);
+            }
+            if(strcmp(car(expr)->s, "or") == 0){
+                return eval_or(expr, frame);
             }
             Value *values = eval_combination(expr, frame);
             return apply(car(values), cdr(values));
