@@ -285,6 +285,10 @@ Value *primitiveCar(Value *args){
         printf("car takes exactly one argument\n");
         texit(1);
     }
+    if(car(args)->type != CONS_TYPE){
+        printf("Error: car takes a list of elements\n");
+        texit(1);
+    }
     else{
         return car(car(args));
     }
@@ -295,6 +299,10 @@ Value *primitiveCar(Value *args){
 Value *primitiveCdr(Value *args){
     if(length(args) != 1){
         printf("cdr takes exactly one argument\n");
+        texit(1);
+    }
+    if(car(args)->type != CONS_TYPE){
+        printf("Error: cdr takes a list of elements\n");
         texit(1);
     }
     else{
