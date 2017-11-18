@@ -530,7 +530,20 @@ Value *eval_letrec(Value *expr, Frame *frame){
             }
             child->bindings = cons(binding, child->bindings);
         }
-        /*evaluate multiple body expressions in let*/
+        //Evaluate expressions after binding
+        Value *cur = child->bindings;
+        Value *evalBindings = makeNull();
+        while(!isNull(cur)){
+            Value *var = car(car(cur));
+            Value *val = car(cdr(car(cur)));
+            val = eval(val, child);
+            Value *binding = cons(var, cons(val, makeNull()));
+            evalBindings = cons(binding, evalBindings);
+            cur = cdr(cur);
+        }
+        child->bindings = evalBindings;
+
+        //Evaluate multiple body expressions in let
         Value *body = cdr(cdr(expr));
         Value *result = eval(car(body), child);
         body = cdr(body);
