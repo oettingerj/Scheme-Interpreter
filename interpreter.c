@@ -814,7 +814,8 @@ Value *eval(Value *expr, Frame *frame){
             Value *values = eval_combination(expr, frame);
             return apply(car(values), cdr(values));
         } else{
-            //???
+            printf("Error: '%s' is not a procedure", car(expr)->s);
+            texit(1);
         }
     }
     printf("Error: invalid expression\n");
