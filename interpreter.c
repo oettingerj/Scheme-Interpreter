@@ -524,9 +524,12 @@ Value *eval_lambda(Value *expr, Frame *frame){
 //Evaluates a set! expression
 Value *eval_set(Value *expr, Frame *frame){
     if(!isNull(cdr(expr)) && !isNull(cdr(cdr(expr)))){
-        Value *newBinding = cdr(expr);
+        Value *variable = car(cdr(expr));
+        Value *value = eval(car(cdr(cdr(expr))), frame);
+        Value *newBinding = cons(variable, cons(value, makeNull()));
         Value *newBindings = makeNull();
         Value *cur = frame->bindings;
+        Frame *curFrame = frame;
         int bindingFound = 0;
         while(!isNull(cur)){
             if(strcmp(car(car(cur))->s, car(newBinding)->s) == 0){
@@ -538,8 +541,8 @@ Value *eval_set(Value *expr, Frame *frame){
             cur = cdr(cur);
             if(isNull(cur) && bindingFound == 0){
                 if(frame->hasParent){
-                    frame = frame->parent;
-                    cur = frame->bindings;
+                    curFrame = frame->parent;
+                    cur = curFrame->bindings;
                 } else{
                     printf("No binding for '%s'\n", car(newBinding)->s);
                     texit(1);
