@@ -401,10 +401,10 @@ Value *eval_symbol(Value *expr, Frame *frame){
     //Loop through bindings, then parent, error if not in bindings
     Value *current = frame->bindings;
     while(!isNull(current)){
-        Value *val = car(current);
+        Value *binding = car(current);
         current = cdr(current);
-        if(strcmp(car(val)->s,expr->s) == 0){
-            return eval(car(cdr(val)), frame);
+        if(strcmp(car(binding)->s, expr->s) == 0){
+            return eval(car(cdr(binding)), frame);
         }
         if(isNull(current) && frame->hasParent){
             frame = frame->parent;
@@ -490,10 +490,13 @@ Value *eval_let(Value *expr, Frame *frame){
 }
 
 //Evaluates a define expression and returns a VOID_TYPE
+//TODO: Check for already defined variables
 Value *eval_define(Value *expr, Frame *frame){
     if(!isNull(cdr(expr)) && !isNull(cdr(cdr(expr)))){
-        Value *variable = cdr(expr);
-        frame->bindings = cons(variable, frame->bindings);
+        Value *variable = car(cdr(expr));
+        Value *value = eval(car(cdr(cdr(expr))), frame);
+        Value *binding = cons(variable, cons(value, makeNull()));
+        frame->bindings = cons(binding, frame->bindings);
         Value *v = talloc(sizeof(Value));
         v->type = VOID_TYPE;
         return v;
@@ -530,7 +533,7 @@ Value *eval_set(Value *expr, Frame *frame){
                 newBindings = cons(newBinding, newBindings);
                 bindingFound = 1;
             } else{
-                newBindings = cons(cur, newBindings);
+                newBindings = cons(car(cur), newBindings);
             }
             cur = cdr(cur);
             if(isNull(cur) && bindingFound == 0){
@@ -633,6 +636,25 @@ Value *eval_cond(Value *expr, Frame *frame){
     return voidReturn;
 }
 
+//Evaluates a begin expression
+Value *eval_begin(Value *expr, Frame *frame){
+    if(!isNull(cdr(expr))){
+        Value *cur = cdr(expr);
+        while(!isNull(cur)){
+            if(isNull(cdr(cur))){
+                return eval(car(cur), frame);
+            } else{
+                eval(car(cur), frame);
+            }
+            cur = cdr(cur);
+        }
+    } else{
+        printf("Incorrect number of args in 'begin'\n");
+        texit(1);
+    }
+    return makeNull();
+}
+
 //Evaluates an expression
 //TODO: Figure out how to make lists evaluate to lists but have (+) not print as (0)
 Value *eval(Value *expr, Frame *frame){
@@ -675,6 +697,9 @@ Value *eval(Value *expr, Frame *frame){
             }
             if(strcmp(car(expr)->s, "cond") == 0){
                 return eval_cond(expr, frame);
+            }
+            if(strcmp(car(expr)->s, "begin") == 0){
+                return eval_begin(expr, frame);
             }
             Value *values = eval_combination(expr, frame);
             return apply(car(values), cdr(values));

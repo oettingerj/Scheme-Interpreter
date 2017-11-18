@@ -1,3 +1,4 @@
-(define plus (lambda y (+ (car y) (car (cdr y)))))
-
-(plus 1 2 3 4 5)
+(define x 5)
+(+ x 3)
+(begin (set! x (+ x 3)) 5)
+x
