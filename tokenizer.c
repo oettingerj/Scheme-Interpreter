@@ -101,6 +101,12 @@ void tokenizeOperators(Value *val, char charRead){
         str[strLen] = 0;
         val->type = SYMBOL_TYPE;
         val->s = str;
+    } else if(charRead == ')'){
+        //+/i has no args
+        str[strLen] = 0;
+        val->type = SYMBOL_TYPE;
+        val->s = str;
+        ungetc(charRead, stdin);
     } else{
         //+/- at start of a number
         bool noDot = true;
