@@ -412,7 +412,7 @@ Value *eval_symbol(Value *expr, Frame *frame){
         Value *binding = car(current);
         current = cdr(current);
         if(strcmp(car(binding)->s, expr->s) == 0){
-            return eval(car(cdr(binding)), frame);
+            return car(cdr(binding));
         }
         if(isNull(current) && frame->hasParent){
             frame = frame->parent;
@@ -813,9 +813,14 @@ Value *eval(Value *expr, Frame *frame){
             }
             Value *values = eval_combination(expr, frame);
             return apply(car(values), cdr(values));
-        } else{
-            printf("Error: '%s' is not a procedure", car(expr)->s);
+        } else if(car(expr)->type != CONS_TYPE){
+            printf("Error: ");
+            printValue(car(expr));
+            printf(" is not a procedure\n");
             texit(1);
+        } else{
+            Value *values = eval_combination(expr, frame);
+            return apply(car(values), cdr(values));
         }
     }
     printf("Error: invalid expression\n");
