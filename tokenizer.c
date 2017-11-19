@@ -312,12 +312,16 @@ void tokenizeSymbol(Value *val, char charRead){
     }
 }
 
+Value *autoLoad(Value *list){
+    
+}
 /*
     Tokenizes scheme files, adding each token in order to a linkedlist
 */
 Value *tokenize(){
     char charRead;
     Value *list = makeNull();
+    list = autoLoad(list);
     charRead = fgetc(stdin);
     /*bool quote1 = false;
     bool quote2 = false;*/
