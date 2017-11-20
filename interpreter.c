@@ -103,15 +103,19 @@ Value *primitivePair(Value *args){
     }
     return ret;
 }
-/*comparison b/w strings not working*/
+/*primitive eq? function*/
 Value *primitiveEq(Value *args){
     if(length(args) != 2){
-        printf("= takes exactly two arguments\n");
+        printf("eq? takes exactly two arguments\n");
         texit(1);
     }
     if(args->type == CONS_TYPE){
         Value *val = car(args);
         Value *ret = car(cdr(args));
+        while (val->type == CONS_TYPE && ret->type == CONS_TYPE){
+            val = car(val);
+            ret = car(ret);
+        }
         if(val->type == INT_TYPE){
             if(ret->type == INT_TYPE){
                 ret->type = BOOL_TYPE;
@@ -155,9 +159,60 @@ Value *primitiveEq(Value *args){
                 ret->s = "#f";
             }
         }
+        else if(val->type == BOOL_TYPE){
+            if(ret->type == BOOL_TYPE){
+                ret->type = BOOL_TYPE;
+                if (val->s == ret->s){
+                    ret->s = "#t";
+                }
+                else{
+                    ret->s = "#f";
+                }
+            }
+            else{
+                ret->type = BOOL_TYPE;
+                ret->s = "#f";
+            }
+        }
+        else if(val->type == NULL_TYPE){
+            if(ret->type == NULL_TYPE){
+                ret->type = BOOL_TYPE;
+                    ret->s = "#t";
+            }
+            else{
+                ret->type = BOOL_TYPE;
+                ret->s = "#f";
+            }
+        }
+        else if(val->type == PRIMITIVE_TYPE){
+            if(ret->type == PRIMITIVE_TYPE){
+                ret->type = BOOL_TYPE;
+                if (ret->s == val->s){
+                    ret->s = "#t";
+            }
+                else{
+                    ret->s = "#f";
+            }
+        }
         else{
             ret->type = BOOL_TYPE;
             ret->s = "#f";
+            }
+        }
+        else if(val->type == CLOSURE_TYPE){
+            if(ret->type == CLOSURE_TYPE){
+                ret->type = BOOL_TYPE;
+                if (ret->s == val->s){
+                    ret->s = "#t";
+                }
+                else{
+                    ret->s = "#f";
+                }
+            }
+            else{
+                ret->type = BOOL_TYPE;
+                ret->s = "#f";
+            }
         }
         return ret;
     }
@@ -167,8 +222,13 @@ Value *primitiveEq(Value *args){
     }
     return makeNull();
 }
+<<<<<<< HEAD
 
 Value *primitiveLeq(Value *args){
+=======
+/*primitive less than equal function*/
+Value * primitiveLeq(Value *args){
+>>>>>>> primitives
     if(length(args) != 2){
         printf("<= takes exactly two arguments\n");
         texit(1);
@@ -186,7 +246,7 @@ Value *primitiveLeq(Value *args){
                     ret->s = "#f";
                 }
             }
-            else{
+            else if (ret->type == DOUBLE_TYPE){
                 ret->type = BOOL_TYPE;
                 if (val->i <= ret->d){
                     ret->s = "#t";
@@ -194,6 +254,10 @@ Value *primitiveLeq(Value *args){
                 else{
                     ret->s = "#f";
                 }
+            }
+            else{
+                printf("Invalid argument type\n");
+                texit(1);
             }
         }
         else if(val->type == DOUBLE_TYPE){
@@ -206,7 +270,7 @@ Value *primitiveLeq(Value *args){
                     ret->s = "#f";
                 }
             }
-            else{
+            else if (ret->type == DOUBLE_TYPE){
                 ret->type = BOOL_TYPE;
                 if (val->d <= ret->d){
                     ret->s = "#t";
@@ -214,6 +278,10 @@ Value *primitiveLeq(Value *args){
                 else{
                     ret->s = "#f";
                 }
+            }
+            else{
+                printf("Invalid argument type\n");
+                texit(1);
             }
         }
         else{
@@ -237,14 +305,13 @@ Value *primitiveDiv(Value *args){
     else if(args->type == CONS_TYPE){
         Value *val = car(args);
         Value *ret = car(cdr(args));
-        if (ret->i == 0 || ret->d == 0.0000000){
-            printf("zero not allowed as a denominator\n");
-            texit(1);
-        }
-
-        else if(val->type == INT_TYPE){
+        if(val->type == INT_TYPE){
             if(ret->type == INT_TYPE){
-                if (val->i / ret->i == 0){
+                if (ret->i == 0 ){
+                    printf("zero not allowed as a denominator\n");
+                    texit(1);
+                }
+                else if (val->i / ret->i == 0){
                     ret->type = DOUBLE_TYPE;
                     ret->d = (float)val->i / (float)ret->i;;
                 }
@@ -257,16 +324,28 @@ Value *primitiveDiv(Value *args){
                 }
             }
             else {
-                ret->d = val->d / ret->i;
+                if (ret->d == 0.0000000){
+                    printf("zero not allowed as a denominator\n");
+                    texit(1);
+                }
+                ret->d = val->i / ret->d;
             }
 
         }
         else if(val->type == DOUBLE_TYPE){
             if(ret->type == INT_TYPE){
+                if (ret->i == 0 ){
+                    printf("zero not allowed as a denominator\n");
+                    texit(1);
+                }
                 ret->type = DOUBLE_TYPE;
                 ret->d = val->d / ret->i;
             }
             else{
+                if (ret->d == 0.0000000){
+                    printf("zero not allowed as a denominator\n");
+                    texit(1);
+                }
                 ret->d = val->d / ret->d;
             }
         }
@@ -322,8 +401,17 @@ Value *primitiveMult(Value *args){
     }
     return makeNull();
 }
+<<<<<<< HEAD
 
 Value *primitiveSub(Value *args){
+=======
+/*primitive substraction function*/
+Value * primitiveSub(Value *args){
+    if(length(args) != 2){
+        printf("Substraction takes exactly two arguments\n");
+        texit(1);
+    }
+>>>>>>> primitives
     if(args->type == NULL_TYPE){
         Value *ret = talloc(sizeof(Value));
         ret->type = INT_TYPE;
