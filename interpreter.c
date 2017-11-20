@@ -11,6 +11,8 @@
 #include "linkedlist.h"
 #include "talloc.h"
 #include "interpreter.h"
+#include "tokenizer.h"
+#include "parser.h"
 
 
 //Prints a Value
@@ -920,6 +922,30 @@ Value *eval_begin(Value *expr, Frame *frame){
     return makeNull();
 }
 
+Value *eval_load(Value *expr){
+    if(length(expr) == 2 && !isNull(car(cdr(expr)))){
+        Value *filename = car(cdr(expr));
+        if(filename->type == STR_TYPE){
+            char *file = filename->s;
+            memmove(file, file+1, strlen(file));
+            file[strlen(file) - 1] = '\0';
+            freopen(file, "r", stdin);
+            Value *tokens = tokenize();
+            Value *tree = parse(tokens);
+            interpret(tree);
+        } else{
+            printf("Error: argument to 'load' must be a string\n");
+            texit(1);
+        }
+    } else{
+        printf("Error: incorrect number of args in 'load'\n");
+        texit(1);
+    }
+    Value *val = talloc(sizeof(Value));
+    val->type = VOID_TYPE;
+    return val;
+}
+
 //Evaluates an expression
 //TODO: Figure out how to make lists evaluate to lists but have (+) not print as (0)
 Value *eval(Value *expr, Frame *frame){
@@ -971,6 +997,9 @@ Value *eval(Value *expr, Frame *frame){
             }
             if(strcmp(car(expr)->s, "begin") == 0){
                 return eval_begin(expr, frame);
+            }
+            if(strcmp(car(expr)->s, "load") == 0){
+                return eval_load(expr);
             }
             Value *values = eval_combination(expr, frame);
             return apply(car(values), cdr(values));
