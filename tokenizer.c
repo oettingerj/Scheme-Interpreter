@@ -315,7 +315,8 @@ void tokenizeSymbol(Value *val, char charRead){
 /*
     Tokenizes scheme files, adding each token in order to a linkedlist
 */
-Value *tokenize(){
+Value *tokenize(char* file){
+    freopen(file, 'r', stdin);
     char charRead;
     Value *list = makeNull();
     charRead = fgetc(stdin);

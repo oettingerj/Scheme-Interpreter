@@ -950,6 +950,7 @@ Value *eval_load(Value *args, Frame *frame){
                 }
                 tree = cdr(tree);
             }
+		printValue(frame->bindings);
         }
     }
     Value *val = talloc(sizeof(Value));
