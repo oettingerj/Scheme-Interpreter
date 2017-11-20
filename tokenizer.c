@@ -319,7 +319,6 @@ Value *tokenize(){
     char charRead;
     Value *list = makeNull();
     charRead = fgetc(stdin);
-    printf("%c", charRead);
     /*bool quote1 = false;
     bool quote2 = false;*/
     while (charRead != EOF) {
