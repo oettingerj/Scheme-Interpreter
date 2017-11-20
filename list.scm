@@ -99,11 +99,7 @@
   (lambda (lst)
     (cdr (cdaar lst))))
 
-<<<<<<< HEAD
-(define cdadr
-=======
 (define cdddadr
->>>>>>> special-forms
   (lambda (lst)
     (cdr (cdadr lst))))
 
@@ -128,11 +124,6 @@
             #t
             (lst? (cdr lst)))
         #f)))
-<<<<<<< HEAD
-    
-=======
-
->>>>>>> special-forms
 
 (define length
   (lambda (lst)
@@ -172,11 +163,7 @@
             (car lst)
             (assq m (cdr lst))))))
 
-<<<<<<< HEAD
-(define appendo
-=======
 (define append
->>>>>>> special-forms
   (lambda (lst1 lst2)
     (if (null? lst2)
         lst1
@@ -212,8 +199,4 @@
   (lambda (f i lst)
     (if (null? lst)
         i
-<<<<<<< HEAD
         (f (car lst) (foldr f (f z (cdr lst)))))))
-=======
-        (f (car lst) (foldr f (f z (cdr lst)))))))
->>>>>>> special-forms
