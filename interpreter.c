@@ -10,6 +10,8 @@
 #include "value.h"
 #include "linkedlist.h"
 #include "talloc.h"
+#include "tokenizer.h"
+#include "parser.h"
 #include "interpreter.h"
 #include "tokenizer.h"
 #include "parser.h"
@@ -322,10 +324,13 @@ Value *primitiveMult(Value *args){
 }
 
 Value *primitiveSub(Value *args){
+<<<<<<< HEAD
     if(length(args) != 2){
         printf("Subtraction takes exactly two arguments\n");
         texit(1);
     }
+=======
+>>>>>>> load
     if(args->type == NULL_TYPE){
         Value *ret = talloc(sizeof(Value));
         ret->type = INT_TYPE;
@@ -356,7 +361,12 @@ Value *primitiveSub(Value *args){
             printf("Invalid argument type\n");
             texit(1);
         }
-        return ret;
+        if(isNull(cdr(cdr(args)))){
+            return ret;
+        }
+        else{
+            return primitiveSub(cons(ret, cdr(cdr(args))));
+        }
     }
     else{
         printf("Invalid argument type\n");
@@ -470,6 +480,27 @@ Value *primitiveCons(Value *args){
     return cons(makeNull(), makeNull());
 }
 
+/*truncate*/
+Value *primitiveTrunc(Value *args){
+    if(length(args) != 1){
+        printf("truncate takes exactly one arguement\n");
+        texit(1);
+    }
+    else{
+        if(car(args)->type != INT_TYPE && car(args)->type != DOUBLE_TYPE){
+            printf("Error: truncate takes a number\n");
+        }
+        if(car(args)->type == INT_TYPE){
+            return car(args);
+        }
+        else{
+            car(args)->d = ((int) car(args)->d);
+            return car(args);
+        }
+    }
+    return makeNull();
+}
+
 
 //Takes a list of s-expressions, calls eval on them, and prints results
 void interpret(Value *tree){
@@ -487,6 +518,10 @@ void interpret(Value *tree){
     bind("<=", primitiveLeq, parent);
     bind("eq?", primitiveEq, parent);
     bind("pair?", primitivePair, parent);
+<<<<<<< HEAD
+=======
+    bind("truncate", primitiveTrunc, parent);
+>>>>>>> load
     while(!isNull(tree)){
         Value *cur = car(tree);
         Value *result = eval(cur, parent);
@@ -922,6 +957,7 @@ Value *eval_begin(Value *expr, Frame *frame){
     return makeNull();
 }
 
+<<<<<<< HEAD
 Value *eval_load(Value *expr){
     if(length(expr) == 2 && !isNull(car(cdr(expr)))){
         Value *filename = car(cdr(expr));
@@ -940,6 +976,36 @@ Value *eval_load(Value *expr){
     } else{
         printf("Error: incorrect number of args in 'load'\n");
         texit(1);
+=======
+/*read in external file, and execute it as if it
+ was directly part of the input*/
+Value *eval_load(Value *args, Frame *frame){
+    if(length(args) != 1){
+        printf("load takes exactly one argument\n");
+        texit(1);
+    }
+    else{
+        if (car(args)->type !=  STR_TYPE){
+            printf("invalid argument type");
+            texit(1);
+        }
+        else{
+            char* filename = car(args)->s;
+            freopen("math.scm", "r", stdin);
+            Value *tokens = tokenize();
+            freopen("/dev/stdin", "r", stdin);
+            Value *tree = parse(tokens);
+            while(!isNull(tree)){
+                Value *cur = car(tree);
+                Value *result = eval(cur, frame);
+                printValue(result);
+                if(result->type != VOID_TYPE){
+                    printf("\n");
+                }
+                tree = cdr(tree);
+            }
+        }
+>>>>>>> load
     }
     Value *val = talloc(sizeof(Value));
     val->type = VOID_TYPE;
@@ -999,7 +1065,11 @@ Value *eval(Value *expr, Frame *frame){
                 return eval_begin(expr, frame);
             }
             if(strcmp(car(expr)->s, "load") == 0){
+<<<<<<< HEAD
                 return eval_load(expr);
+=======
+                return eval_load(cdr(expr), frame);
+>>>>>>> load
             }
             Value *values = eval_combination(expr, frame);
             return apply(car(values), cdr(values));

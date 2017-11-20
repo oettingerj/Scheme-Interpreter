@@ -24,7 +24,7 @@ struct Value {
       void *p;
       int i;
       double d;
-      char *s;
+      char* s;
       struct ConsCell {
          struct Value *car;
          struct Value *cdr;
