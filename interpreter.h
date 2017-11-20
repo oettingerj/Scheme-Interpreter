@@ -13,4 +13,5 @@ typedef struct Frame Frame;
 
 void printCons(Value *v);
 void interpret(Value *tree);
+void load(char *str, Frame *frame);
 Value *eval(Value *expr, Frame *frame);

@@ -8,6 +8,7 @@
 #include "talloc.h"
 #include "linkedlist.h"
 #include "tokenizer.h"
+#include "interpreter.h"
 #include <stdbool.h>
 
 /*

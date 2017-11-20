@@ -5,10 +5,10 @@
 #include "parser.h"
 #include "interpreter.h"
 
-int main(void) {
-   Value *list = tokenize();
-   Value *tree = parse(list);
-   interpret(tree);
-   tfree();
-   return 0;
+int main(int argc, char *argv[]) {
+    Value *list = tokenize();
+    Value *tree = parse(list);
+    interpret(tree);
+    tfree();
+    return 0;
 }

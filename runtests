@@ -1,0 +1,21 @@
+#!/bin/bash
+
+for i in {1..4}
+do
+	./tokenizer < test.tokenizer.input.0$i | diff - test.tokenizer.output.0$i
+done
+
+for i in {1..4}
+do
+	./parser < test.parser.input.0$i | diff - test.parser.output.0$i
+done
+
+for i in {1..9}
+do
+	./interpreter < test.eval.input.0$i | diff - test.eval.output.0$i
+done
+
+for i in {10..13}
+do
+	./interpreter < test.eval.input.$i | diff - test.eval.output.$i
+done
