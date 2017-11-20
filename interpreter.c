@@ -570,11 +570,8 @@ Value *primitiveTrunc(Value *args){
 
 
 //Takes a list of s-expressions, calls eval on them, and prints results
-void interpret(Value *tree){
-    Frame *parent = talloc(sizeof(Frame));
-    parent->bindings = makeNull();
-    parent->hasParent = 0;
-
+//Returns parent frame to allow for autoloading libraries into bindings
+void interpret(Value *tree, Frame *parent){
     bind("+", primitiveAdd, parent);
     bind("null?", primitiveIsNull, parent);
     bind("car", primitiveCar, parent);
@@ -589,7 +586,7 @@ void interpret(Value *tree){
     bind("truncate", primitiveTrunc, parent);
 
     //Load math and list library functions
-    load("math.scm", parent);
+    //load("math.scm", parent);
     load("list.scm", parent);
 
     while(!isNull(tree)){
