@@ -791,7 +791,7 @@ Value *eval_letrec(Value *expr, Frame *frame){
                 Value *val = car(current);
                 current = cdr(current);
                 if(strcmp(car(binding)->s,car(val)->s) == 0){
-                    printf("Duplicate identifier in 'let': %s\n",car(val)->s);
+                    printf("Duplicate identifier in 'letrec': %s\n",car(val)->s);
                     texit(1);
                 }
             }
@@ -820,7 +820,7 @@ Value *eval_letrec(Value *expr, Frame *frame){
         }
         return result;
     }
-    printf("Incorrect number of args in 'let'\n");
+    printf("Incorrect number of args in 'letrec'\n");
     texit(1);
     return makeNull();
 }
@@ -836,7 +836,7 @@ Value *eval_let_star(Value *expr, Frame *frame){
         Value *formals = car(cdr(expr));
         while(!isNull(formals)){
             if(isNull(car(formals))){
-                printf("Error: empty pair in let expression\n");
+                printf("Error: empty pair in let* expression\n");
                 texit(1);
             }
             Value *variable = car(car(formals));
@@ -849,7 +849,7 @@ Value *eval_let_star(Value *expr, Frame *frame){
                 Value *val = car(current);
                 current = cdr(current);
                 if(strcmp(car(binding)->s,car(val)->s) == 0){
-                    printf("Duplicate identifier in 'let': %s\n",car(val)->s);
+                    printf("Duplicate identifier in 'let*': %s\n",car(val)->s);
                     texit(1);
                 }
             }
@@ -871,7 +871,6 @@ Value *eval_let_star(Value *expr, Frame *frame){
 }
 
 //Evaluates a define expression and returns a VOID_TYPE
-//TODO: Check for already defined variables
 Value *eval_define(Value *expr, Frame *frame){
     if(!isNull(cdr(expr)) && !isNull(cdr(cdr(expr)))){
         Value *variable = car(cdr(expr));

@@ -99,7 +99,7 @@
   (lambda (lst)
     (cdr (cdaar lst))))
 
-(define cdadr
+(define cdddadr
   (lambda (lst)
     (cdr (cdadr lst))))
 
