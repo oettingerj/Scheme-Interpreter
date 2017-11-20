@@ -84,14 +84,14 @@ void bind(char *name, Value *(*function)(Value *), Frame *frame){
     Value *bound = cons(variable, cons(value, makeNull()));
     frame->bindings = cons(bound, frame->bindings);
 }
-
+/*chnages all char to lowercase for comparison*/
 Value *lowerCaseWord(Value *a){
     for (int i = 0; i < strlen(a->s); i++){
         a->s[i] = tolower(a->s[i]);
     }
     return a;
 }
-/*quote problems with comb of num and . eg (pair? (quote 3 . 3))*/
+/*primitive pair? function*/
 Value *primitivePair(Value *args){
     Value *ret = talloc(sizeof(Value));
     ret->type = BOOL_TYPE;
@@ -217,12 +217,12 @@ Value *primitiveEq(Value *args){
         return ret;
     }
     else{
-        printf("Invalid argument type\n");
+        printf("Invalid argument type in eq?\n");
         texit(1);
     }
     return makeNull();
 }
-
+/*primitive <= function*/
 Value *primitiveLeq(Value *args){
     if(length(args) != 2){
         printf("<= takes exactly two arguments\n");
@@ -251,7 +251,7 @@ Value *primitiveLeq(Value *args){
                 }
             }
             else{
-                printf("Invalid argument type\n");
+                printf("Invalid argument type in <=\n");
                 texit(1);
             }
         }
@@ -275,23 +275,23 @@ Value *primitiveLeq(Value *args){
                 }
             }
             else{
-                printf("Invalid argument type\n");
+                printf("Invalid argument type in <=\n");
                 texit(1);
             }
         }
         else{
-            printf("Invalid argument type\n");
+            printf("Invalid argument type in <=\n");
             texit(1);
         }
         return ret;
     }
     else{
-        printf("Invalid argument type\n");
+        printf("Invalid argument type in <=\n");
         texit(1);
     }
     return makeNull();
 }
-/*primitive div function*/
+/*primitive division function*/
 Value *primitiveDiv(Value *args){
     if(length(args) != 2){
         printf("Division takes exactly two arguments\n");
@@ -303,7 +303,7 @@ Value *primitiveDiv(Value *args){
         if(val->type == INT_TYPE){
             if(ret->type == INT_TYPE){
                 if (ret->i == 0 ){
-                    printf("zero not allowed as a denominator\n");
+                    printf("zero not allowed as a denominator in division \n");
                     texit(1);
                 }
                 else if (val->i / ret->i == 0){
@@ -320,7 +320,7 @@ Value *primitiveDiv(Value *args){
             }
             else {
                 if (ret->d == 0.0000000){
-                    printf("zero not allowed as a denominator\n");
+                    printf("zero not allowed as a denominator in division \n");
                     texit(1);
                 }
                 ret->d = val->i / ret->d;
@@ -330,7 +330,7 @@ Value *primitiveDiv(Value *args){
         else if(val->type == DOUBLE_TYPE){
             if(ret->type == INT_TYPE){
                 if (ret->i == 0 ){
-                    printf("zero not allowed as a denominator\n");
+                    printf("zero not allowed as a denominator in division \n");
                     texit(1);
                 }
                 ret->type = DOUBLE_TYPE;
@@ -338,25 +338,25 @@ Value *primitiveDiv(Value *args){
             }
             else{
                 if (ret->d == 0.0000000){
-                    printf("zero not allowed as a denominator\n");
+                    printf("zero not allowed as a denominator in division \n");
                     texit(1);
                 }
                 ret->d = val->d / ret->d;
             }
         }
         else{
-            printf("Invalid argument type\n");
+            printf("Invalid argument type in division\n");
             texit(1);
         }
         return ret;
     }
     else{
-        printf("Invalid argument type\n");
+        printf("Invalid argument type in division\n");
         texit(1);
     }
     return makeNull();
 }
-/*primitive multpilication function*/
+/*primitive multiplication function*/
 Value *primitiveMult(Value *args){
     if(args->type == NULL_TYPE){
         Value *ret = talloc(sizeof(Value));
@@ -385,18 +385,18 @@ Value *primitiveMult(Value *args){
             }
         }
         else{
-            printf("Invalid argument type\n");
+            printf("Invalid argument type in multiplication\n");
             texit(1);
         }
         return ret;
     }
     else{
-        printf("Invalid argument type\n");
+        printf("Invalid argument type in multiplication\n");
         texit(1);
     }
     return makeNull();
 }
-
+/*primitive substraction function*/
 Value *primitiveSub(Value *args){
     if(args->type == NULL_TYPE){
         Value *ret = talloc(sizeof(Value));
@@ -425,7 +425,7 @@ Value *primitiveSub(Value *args){
             }
         }
         else{
-            printf("Invalid argument type\n");
+            printf("Invalid argument type in substraction\n");
             texit(1);
         }
         if(isNull(cdr(cdr(args)))){
@@ -436,7 +436,7 @@ Value *primitiveSub(Value *args){
         }
     }
     else{
-        printf("Invalid argument type\n");
+        printf("Invalid argument type in substraction\n");
         texit(1);
     }
     return makeNull();
