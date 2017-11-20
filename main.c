@@ -5,7 +5,16 @@
 #include "parser.h"
 #include "interpreter.h"
 
-int main(void) {
+int main(int argc, char *argv[]) {
+    printf("%i",argc);
+    for(int x = 0; x < argc; x++){
+        printf("%s", argv[x]);
+        char* fileload = "(load ";
+        strcat(fileload, argv[x]);
+        strcat(fileload, ")");
+        printf("%s", fileload);
+    }
+    
    Value *list = tokenize();
    Value *tree = parse(list);
    interpret(tree);
