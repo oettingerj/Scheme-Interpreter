@@ -53,22 +53,17 @@
         #t)))
 
 (define max
-  (lambda args
-    (if (= (length args) 1)
-        (car args)
-        (let ((y (max (cdr args))))
-          (if (> (car args) (max (cdr args)))
-            (car args)
-            y)))))
+  (lambda (x y)
+    (if (>= x y)
+        x
+        y)))
 
-(define min
-    (lambda args
-    (if (= (length args) 1)
-        (car args)
-        (let ((y (min (cdr args))))
-          (if (< (car args) (min (cdr args)))
-            (car args)
-            y)))))
+(define max
+  (lambda (x y)
+    (if (<= x y)
+        x
+        y)))
+
 
 (define abs
   (lambda (x)
