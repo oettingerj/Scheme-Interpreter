@@ -84,7 +84,7 @@
 
 (define lcm
   (lambda (x y)
-    x))
+    (/ (* x y) (gcd x y))))
 
 (define modulo
   (lambda (x m)
