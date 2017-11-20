@@ -222,13 +222,8 @@ Value *primitiveEq(Value *args){
     }
     return makeNull();
 }
-<<<<<<< HEAD
 
 Value *primitiveLeq(Value *args){
-=======
-/*primitive less than equal function*/
-Value * primitiveLeq(Value *args){
->>>>>>> primitives
     if(length(args) != 2){
         printf("<= takes exactly two arguments\n");
         texit(1);
@@ -401,17 +396,8 @@ Value *primitiveMult(Value *args){
     }
     return makeNull();
 }
-<<<<<<< HEAD
 
 Value *primitiveSub(Value *args){
-=======
-/*primitive substraction function*/
-Value * primitiveSub(Value *args){
-    if(length(args) != 2){
-        printf("Substraction takes exactly two arguments\n");
-        texit(1);
-    }
->>>>>>> primitives
     if(args->type == NULL_TYPE){
         Value *ret = talloc(sizeof(Value));
         ret->type = INT_TYPE;

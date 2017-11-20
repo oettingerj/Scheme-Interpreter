@@ -6,9 +6,9 @@
 #include "interpreter.h"
 
 int main(int argc, char *argv[]) {
-    /*Value *list = makeNull();
+    Value *list = makeNull();
     for(int x = 1; x < argc; x++){
-    Value *load = talloc(sizeof(Value));
+       /* Value *load = talloc(sizeof(Value));
 	load->type = SYMBOL_TYPE;
 	load->s = "load";
 	Value *file = talloc(sizeof(Value));
@@ -18,12 +18,12 @@ int main(int argc, char *argv[]) {
 	expr = cons(load, expr);
 	expr = cons(file, expr);
 	expr = reverse(expr);
-	tree = cons(expr, tree);
+	tree = cons(expr, tree);*/
 	list = cons(tokenize(argv[x]),list);
-    }*/
+    }
     
-   Value *list = tokenize();
-   Value *tree = parse(list);
+   list = cons(tokenize("/dev/stdin"),list);
+   Value *tree = cons(tree, parse(list));
    interpret(tree);
    tfree();
    return 0;
