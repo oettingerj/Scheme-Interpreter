@@ -5,13 +5,14 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <ctype.h>
 #include <stdbool.h>
 #include "value.h"
 #include "linkedlist.h"
 #include "talloc.h"
-#include "interpreter.h"
 #include "tokenizer.h"
 #include "parser.h"
+#include "interpreter.h"
 
 
 //Prints a Value
@@ -81,6 +82,150 @@ void bind(char *name, Value *(*function)(Value *), Frame *frame){
     Value *bound = cons(variable, cons(value, makeNull()));
     frame->bindings = cons(bound, frame->bindings);
 }
+
+Value *lowerCaseWord(Value *a){
+    for (int i = 0; i < strlen(a->s); i++){
+        a->s[i] = tolower(a->s[i]);
+    }
+    return a;
+}
+/*quote problems with comb of num and . eg (pair? (quote 3 . 3))*/
+Value *primitivePair(Value *args){
+    Value *ret = talloc(sizeof(Value));
+    ret->type = BOOL_TYPE;
+    if((car(args))->type == CONS_TYPE){
+        ret->s = "#t";
+    }
+    else {
+        ret->s = "#f";
+    }
+    return ret;
+}
+/*comparison b/w strings not working*/
+Value *primitiveEq(Value *args){
+    if(length(args) != 2){
+        printf("= takes exactly two arguments\n");
+        texit(1);
+    }
+    if(args->type == CONS_TYPE){
+        Value *val = car(args);
+        Value *ret = car(cdr(args));
+        if(val->type == INT_TYPE){
+            if(ret->type == INT_TYPE){
+                ret->type = BOOL_TYPE;
+                if (val->i == ret->i){
+                    ret->s = "#t";
+                }
+                else{
+                    ret->s = "#f";
+                }
+            }
+            else {
+                ret->type = BOOL_TYPE;
+                ret->s = "#t";
+                }
+        }
+        else if(val->type == DOUBLE_TYPE){
+            if(ret->type == DOUBLE_TYPE){
+                ret->type = BOOL_TYPE;
+                    ret->s = "#t";
+            }
+            else{
+                ret->type = BOOL_TYPE;
+                ret->s = "#f";
+            }
+        }
+        else if(val->type == SYMBOL_TYPE){
+            if(ret->type == SYMBOL_TYPE){
+                ret->type = BOOL_TYPE;
+                if (strlen(val->s) != strlen(ret->s)){
+                    ret->s = "#f";
+                }
+                else if (strcmp(lowerCaseWord(val)->s,lowerCaseWord(ret)->s) == 0){
+                    ret->s = "#t";
+                }
+                else{
+                    ret->s = "#f";
+                }
+            }
+            else{
+                ret->type = BOOL_TYPE;
+                ret->s = "#f";
+            }
+        }
+        else{
+            ret->type = BOOL_TYPE;
+            ret->s = "#f";
+        }
+        return ret;
+    }
+    else{
+        printf("Invalid argument type\n");
+        texit(1);
+    }
+    return makeNull();
+}
+
+Value *primitiveLeq(Value *args){
+    if(length(args) != 2){
+        printf("<= takes exactly two arguments\n");
+        texit(1);
+    }
+    if(args->type == CONS_TYPE){
+        Value *val = car(args);
+        Value *ret = car(cdr(args));
+        if(val->type == INT_TYPE){
+            if(ret->type == INT_TYPE){
+                ret->type = BOOL_TYPE;
+                if (val->i <= ret->i){
+                    ret->s = "#t";
+                }
+                else{
+                    ret->s = "#f";
+                }
+            }
+            else{
+                ret->type = BOOL_TYPE;
+                if (val->i <= ret->d){
+                    ret->s = "#t";
+                }
+                else{
+                    ret->s = "#f";
+                }
+            }
+        }
+        else if(val->type == DOUBLE_TYPE){
+            if(ret->type == INT_TYPE){
+                ret->type = BOOL_TYPE;
+                if (val->d <= ret->i){
+                    ret->s = "#t";
+                }
+                else{
+                    ret->s = "#f";
+                }
+            }
+            else{
+                ret->type = BOOL_TYPE;
+                if (val->d <= ret->d){
+                    ret->s = "#t";
+                }
+                else{
+                    ret->s = "#f";
+                }
+            }
+        }
+        else{
+            printf("Invalid argument type\n");
+            texit(1);
+        }
+        return ret;
+    }
+    else{
+        printf("Invalid argument type\n");
+        texit(1);
+    }
+    return makeNull();
+}
 /*primitive div function*/
 Value *primitiveDiv(Value *args){
     if(length(args) != 2){
@@ -136,7 +281,7 @@ Value *primitiveDiv(Value *args){
     return makeNull();
 }
 /*primitive multpilication function*/
-Value * primitiveMult(Value *args){
+Value *primitiveMult(Value *args){
     if(args->type == NULL_TYPE){
         Value *ret = talloc(sizeof(Value));
         ret->type = INT_TYPE;
@@ -176,9 +321,9 @@ Value * primitiveMult(Value *args){
     return makeNull();
 }
 
-Value * primitiveSub(Value *args){
+Value *primitiveSub(Value *args){
     if(length(args) != 2){
-        printf("Substraction takes exactly two arguments\n");
+        printf("Subtraction takes exactly two arguments\n");
         texit(1);
     }
     if(args->type == NULL_TYPE){
@@ -222,7 +367,7 @@ Value * primitiveSub(Value *args){
 
 /*Add
  For right now, everything's a float*/
-Value * primitiveAdd(Value *args){
+Value *primitiveAdd(Value *args){
     if(args->type == NULL_TYPE){
         Value *ret = talloc(sizeof(Value));
         ret->type = INT_TYPE;
@@ -287,6 +432,10 @@ Value *primitiveCar(Value *args){
         printf("car takes exactly one argument\n");
         texit(1);
     }
+    if(car(args)->type != CONS_TYPE){
+        printf("Error: car takes a list of elements\n");
+        texit(1);
+    }
     else{
         return car(car(args));
     }
@@ -297,6 +446,10 @@ Value *primitiveCar(Value *args){
 Value *primitiveCdr(Value *args){
     if(length(args) != 1){
         printf("cdr takes exactly one argument\n");
+        texit(1);
+    }
+    if(car(args)->type != CONS_TYPE){
+        printf("Error: cdr takes a list of elements\n");
         texit(1);
     }
     else{
@@ -317,6 +470,7 @@ Value *primitiveCons(Value *args){
     return cons(makeNull(), makeNull());
 }
 
+
 //Takes a list of s-expressions, calls eval on them, and prints results
 void interpret(Value *tree){
     Frame *parent = talloc(sizeof(Frame));
@@ -330,6 +484,9 @@ void interpret(Value *tree){
     bind("*", primitiveMult, parent);
     bind("/", primitiveDiv, parent);
     bind("-", primitiveSub, parent);
+    bind("<=", primitiveLeq, parent);
+    bind("eq?", primitiveEq, parent);
+    bind("pair?", primitivePair, parent);
     while(!isNull(tree)){
         Value *cur = car(tree);
         Value *result = eval(cur, parent);
@@ -350,17 +507,22 @@ Value *apply(Value *function, Value *args){
         child->hasParent = 1;
         Value *actual = args;
         Value *formal = function->clo.params;
-        while(!isNull(formal)){
-            if(isNull(actual)){
-                printf("Incorrect number of params in function");
-                texit(1);
-            } else{
-                Value *binding = cons(car(formal), cons(car(actual),
-                                                        makeNull()));
-                child->bindings = cons(binding, child->bindings);
-                actual = cdr(actual);
-                formal = cdr(formal);
+        if(formal->type == CONS_TYPE){
+            while(!isNull(formal)){
+                if(isNull(actual)){
+                    printf("Incorrect number of params in function");
+                    texit(1);
+                } else{
+                    Value *binding = cons(car(formal), cons(car(actual),
+                                                            makeNull()));
+                    child->bindings = cons(binding, child->bindings);
+                    actual = cdr(actual);
+                    formal = cdr(formal);
+                }
             }
+        } else{
+            Value *binding = cons(formal, cons(actual, makeNull()));
+            child->bindings = cons(binding, child->bindings);
         }
 
         Value *body = function->clo.body;
@@ -397,10 +559,10 @@ Value *eval_symbol(Value *expr, Frame *frame){
     //Loop through bindings, then parent, error if not in bindings
     Value *current = frame->bindings;
     while(!isNull(current)){
-        Value *val = car(current);
+        Value *binding = car(current);
         current = cdr(current);
-        if(strcmp(car(val)->s,expr->s) == 0){
-            return eval(car(cdr(val)), frame);
+        if(strcmp(car(binding)->s, expr->s) == 0){
+            return car(cdr(binding));
         }
         if(isNull(current) && frame->hasParent){
             frame = frame->parent;
@@ -453,22 +615,128 @@ Value *eval_let(Value *expr, Frame *frame){
         child->bindings = makeNull();
         Value *formals = car(cdr(expr));
         while(!isNull(formals)){
-            Value *variable = car(formals);
-            if(isNull(variable)){
+            if(isNull(car(formals))){
                 printf("Error: empty pair in let expression\n");
                 texit(1);
             }
+            Value *variable = car(car(formals));
+            Value *value = eval(car(cdr(car(formals))), frame);
+            Value *binding = cons(variable, cons(value, makeNull()));
+
             formals = cdr(formals);
             Value *current = child->bindings;
             while(!isNull(current)){
                 Value *val = car(current);
                 current = cdr(current);
-                if(strcmp(car(variable)->s,car(val)->s) == 0){
+                if(strcmp(car(binding)->s,car(val)->s) == 0){
                     printf("Duplicate identifier in 'let': %s\n",car(val)->s);
                     texit(1);
                 }
             }
-            child->bindings = cons(variable, child->bindings);
+            child->bindings = cons(binding, child->bindings);
+        }
+        /*evaluate multiple body expressions in let*/
+        Value *body = cdr(cdr(expr));
+        Value *result = eval(car(body), child);
+        body = cdr(body);
+        while(!isNull(body)){
+            result = eval(car(body), child);
+            body = cdr(body);
+        }
+        return result;
+    }
+    printf("Incorrect number of args in 'let'\n");
+    texit(1);
+    return makeNull();
+}
+
+//Evaluates a letrec expression and returns its value
+Value *eval_letrec(Value *expr, Frame *frame){
+    if(!isNull(cdr(expr)) && !isNull(cdr(cdr(expr)))){
+        /*bind variables*/
+        Frame *child = talloc(sizeof(Frame));
+        child->parent = frame;
+        child->hasParent = 1;
+        child->bindings = makeNull();
+        Value *formals = car(cdr(expr));
+        while(!isNull(formals)){
+            if(isNull(car(formals))){
+                printf("Error: empty pair in let expression\n");
+                texit(1);
+            }
+            Value *variable = car(car(formals));
+            Value *value = car(cdr(car(formals)));
+            Value *binding = cons(variable, cons(value, makeNull()));
+
+            formals = cdr(formals);
+            Value *current = child->bindings;
+            while(!isNull(current)){
+                Value *val = car(current);
+                current = cdr(current);
+                if(strcmp(car(binding)->s,car(val)->s) == 0){
+                    printf("Duplicate identifier in 'let': %s\n",car(val)->s);
+                    texit(1);
+                }
+            }
+            child->bindings = cons(binding, child->bindings);
+        }
+        //Evaluate expressions after binding
+        Value *cur = child->bindings;
+        Value *evalBindings = makeNull();
+        while(!isNull(cur)){
+            Value *var = car(car(cur));
+            Value *val = car(cdr(car(cur)));
+            val = eval(val, child);
+            Value *binding = cons(var, cons(val, makeNull()));
+            evalBindings = cons(binding, evalBindings);
+            cur = cdr(cur);
+        }
+        child->bindings = evalBindings;
+
+        //Evaluate multiple body expressions in let
+        Value *body = cdr(cdr(expr));
+        Value *result = eval(car(body), child);
+        body = cdr(body);
+        while(!isNull(body)){
+            result = eval(car(body), child);
+            body = cdr(body);
+        }
+        return result;
+    }
+    printf("Incorrect number of args in 'let'\n");
+    texit(1);
+    return makeNull();
+}
+
+//Evaluates a let* expression and returns its value
+Value *eval_let_star(Value *expr, Frame *frame){
+    if(!isNull(cdr(expr)) && !isNull(cdr(cdr(expr)))){
+        /*bind variables*/
+        Frame *child = talloc(sizeof(Frame));
+        child->parent = frame;
+        child->hasParent = 1;
+        child->bindings = makeNull();
+        Value *formals = car(cdr(expr));
+        while(!isNull(formals)){
+            if(isNull(car(formals))){
+                printf("Error: empty pair in let expression\n");
+                texit(1);
+            }
+            Value *variable = car(car(formals));
+            Value *value = eval(car(cdr(car(formals))), child);
+            Value *binding = cons(variable, cons(value, makeNull()));
+
+            formals = cdr(formals);
+            Value *current = child->bindings;
+            while(!isNull(current)){
+                Value *val = car(current);
+                current = cdr(current);
+                if(strcmp(car(binding)->s,car(val)->s) == 0){
+                    printf("Duplicate identifier in 'let': %s\n",car(val)->s);
+                    texit(1);
+                }
+            }
+            child->bindings = cons(binding, child->bindings);
         }
         /*evaluate multiple body expressions in let*/
         Value *body = cdr(cdr(expr));
@@ -486,10 +754,13 @@ Value *eval_let(Value *expr, Frame *frame){
 }
 
 //Evaluates a define expression and returns a VOID_TYPE
+//TODO: Check for already defined variables
 Value *eval_define(Value *expr, Frame *frame){
     if(!isNull(cdr(expr)) && !isNull(cdr(cdr(expr)))){
-        Value *variable = cdr(expr);
-        frame->bindings = cons(variable, frame->bindings);
+        Value *variable = car(cdr(expr));
+        Value *value = eval(car(cdr(cdr(expr))), frame);
+        Value *binding = cons(variable, cons(value, makeNull()));
+        frame->bindings = cons(binding, frame->bindings);
         Value *v = talloc(sizeof(Value));
         v->type = VOID_TYPE;
         return v;
@@ -514,6 +785,143 @@ Value *eval_lambda(Value *expr, Frame *frame){
     return makeNull();
 }
 
+//Evaluates a set! expression
+Value *eval_set(Value *expr, Frame *frame){
+    if(!isNull(cdr(expr)) && !isNull(cdr(cdr(expr)))){
+        Value *variable = car(cdr(expr));
+        Value *value = eval(car(cdr(cdr(expr))), frame);
+        Value *newBinding = cons(variable, cons(value, makeNull()));
+        Value *newBindings = makeNull();
+        Value *cur = frame->bindings;
+        Frame *curFrame = frame;
+        int bindingFound = 0;
+        while(!isNull(cur)){
+            if(strcmp(car(car(cur))->s, car(newBinding)->s) == 0){
+                newBindings = cons(newBinding, newBindings);
+                bindingFound = 1;
+            } else{
+                newBindings = cons(car(cur), newBindings);
+            }
+            cur = cdr(cur);
+            if(isNull(cur) && bindingFound == 0){
+                if(frame->hasParent){
+                    curFrame = frame->parent;
+                    cur = curFrame->bindings;
+                } else{
+                    printf("No binding for '%s'\n", car(newBinding)->s);
+                    texit(1);
+                }
+            }
+        }
+        frame->bindings = newBindings;
+        Value *v = talloc(sizeof(Value));
+        v->type = VOID_TYPE;
+        return v;
+    }
+    printf("Incorrect number of args in 'set!'\n");
+    texit(1);
+    return makeNull();
+}
+
+//Evaluates an and expression
+Value *eval_and(Value * expr, Frame *frame){
+    Value *boolean = talloc(sizeof(Value));
+    boolean->type = BOOL_TYPE;
+    if(!isNull(cdr(expr))){
+        Value *cur = cdr(expr);
+        while(!isNull(cur)){
+            Value *val = eval(car(cur), frame);
+            if(val->type == BOOL_TYPE && strcmp(val->s, "#f") == 0){
+                boolean->s = "#f";
+                return boolean;
+            }
+            if(isNull(cdr(cur))){
+                return eval(car(cur), frame);
+            }
+            cur = cdr(cur);
+        }
+    } else{
+        printf("Incorrect number of args in 'and'\n");
+        texit(1);
+    }
+    boolean->s = "#t";
+    return boolean;
+}
+
+//Evaluates an or expression
+Value *eval_or(Value * expr, Frame *frame){
+    Value *boolean = talloc(sizeof(Value));
+    boolean->type = BOOL_TYPE;
+    if(!isNull(cdr(expr))){
+        Value *cur = cdr(expr);
+        while(!isNull(cur)){
+            Value *val = eval(car(cur), frame);
+            if(!(val->type == BOOL_TYPE && strcmp(val->s, "#f") == 0)){
+                return val;
+            }
+            cur = cdr(cur);
+        }
+    } else{
+        printf("Incorrect number of args in 'and'\n");
+        texit(1);
+    }
+    boolean->s = "#f";
+    return boolean;
+}
+
+//Evaluates cond expressions
+Value *eval_cond(Value *expr, Frame *frame){
+    if(!isNull(cdr(expr))){
+        Value *cur = cdr(expr);
+        while(!isNull(cur)){
+            Value *testExpr = car(cur);
+            if(testExpr->type == CONS_TYPE && !isNull(cdr(testExpr))){
+                Value *test = eval(car(testExpr), frame);
+                if(test->type == SYMBOL_TYPE && strcmp(test->s, "else") == 0){
+                    if(isNull(cdr(cur))){
+                        return eval(car(cdr(testExpr)), frame);
+                    } else{
+                        printf("Error: else must be in last test-expr pair in cond expression\n");
+                        texit(1);
+                    }
+                }
+                if(!(test->type == BOOL_TYPE && strcmp(test->s, "#f") == 0)){
+                    return eval(car(cdr(testExpr)), frame);
+                }
+            } else{
+                printf("Invalid test-expr pair\n");
+                texit(1);
+            }
+            cur = cdr(cur);
+        }
+    } else{
+        printf("Incorrect number of args in 'cond'\n");
+        texit(1);
+    }
+    Value *voidReturn = talloc(sizeof(Value));
+    voidReturn->type = VOID_TYPE;
+    return voidReturn;
+}
+
+//Evaluates a begin expression
+Value *eval_begin(Value *expr, Frame *frame){
+    if(!isNull(cdr(expr))){
+        Value *cur = cdr(expr);
+        while(!isNull(cur)){
+            if(isNull(cdr(cur))){
+                return eval(car(cur), frame);
+            } else{
+                eval(car(cur), frame);
+            }
+            cur = cdr(cur);
+        }
+    } else{
+        printf("Incorrect number of args in 'begin'\n");
+        texit(1);
+    }
+    return makeNull();
+}
+
 /*read in external file, and execute it as if it
  was directly part of the input*/
 Value *eval_load(Value *args, Frame *frame){
@@ -528,7 +936,7 @@ Value *eval_load(Value *args, Frame *frame){
         }
         else{
             char *filename = car(args)->s;
-            freopen("test.eval.input.11", "r", stdin);
+            freopen(filename, "r", stdin);
             Value *tokens = tokenize();
             freopen("/dev/stdin", "r", stdin);
             Value *tree = parse(tokens);
@@ -549,6 +957,7 @@ Value *eval_load(Value *args, Frame *frame){
 }
 
 //Evaluates an expression
+//TODO: Figure out how to make lists evaluate to lists but have (+) not print as (0)
 Value *eval(Value *expr, Frame *frame){
     if(expr->type == INT_TYPE || expr->type == DOUBLE_TYPE ||
        expr->type == STR_TYPE || expr->type == BOOL_TYPE ||
@@ -556,6 +965,9 @@ Value *eval(Value *expr, Frame *frame){
         return expr;
     }
     if(expr->type == SYMBOL_TYPE){
+        if(strcmp(expr->s, "else") == 0){
+            return expr;
+        }
         return eval_symbol(expr, frame);
     }
     if(expr->type == CONS_TYPE){
@@ -569,19 +981,46 @@ Value *eval(Value *expr, Frame *frame){
             if(strcmp(car(expr)->s, "let") == 0){
                 return eval_let(expr, frame);
             }
+            if(strcmp(car(expr)->s, "letrec") == 0){
+                return eval_letrec(expr, frame);
+            }
+            if(strcmp(car(expr)->s, "let*") == 0){
+                return eval_let_star(expr, frame);
+            }
             if(strcmp(car(expr)->s, "define") == 0){
                 return eval_define(expr, frame);
             }
             if(strcmp(car(expr)->s, "lambda") == 0){
                 return eval_lambda(expr, frame);
             }
+            if(strcmp(car(expr)->s, "set!") == 0){
+                return eval_set(expr, frame);
+            }
+            if(strcmp(car(expr)->s, "and") == 0){
+                return eval_and(expr, frame);
+            }
+            if(strcmp(car(expr)->s, "or") == 0){
+                return eval_or(expr, frame);
+            }
+            if(strcmp(car(expr)->s, "cond") == 0){
+                return eval_cond(expr, frame);
+            }
+            if(strcmp(car(expr)->s, "begin") == 0){
+                return eval_begin(expr, frame);
+            }
             if(strcmp(car(expr)->s, "load") == 0){
                 return eval_load(cdr(expr), frame);
             }
             Value *values = eval_combination(expr, frame);
             return apply(car(values), cdr(values));
+        } else if(car(expr)->type != CONS_TYPE){
+            printf("Error: ");
+            printValue(car(expr));
+            printf(" is not a procedure\n");
+            texit(1);
         } else{
-            return car(expr);
+            Value *values = eval_combination(expr, frame);
+            return apply(car(values), cdr(values));
         }
     }
     printf("Error: invalid expression\n");
