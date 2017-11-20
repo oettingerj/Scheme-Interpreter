@@ -15,7 +15,7 @@ do
 	./interpreter < test.eval.input.0$i | diff - test.eval.output.0$i
 done
 
-for i in {10..13}
+for i in {10..14}
 do
 	./interpreter < test.eval.input.$i | diff - test.eval.output.$i
 done
