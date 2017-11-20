@@ -586,7 +586,7 @@ void interpret(Value *tree, Frame *parent){
     bind("truncate", primitiveTrunc, parent);
 
     //Load math and list library functions
-    //load("math.scm", parent);
+    load("math.scm", parent);
     load("list.scm", parent);
 
     while(!isNull(tree)){
@@ -703,7 +703,7 @@ Value *eval_if(Value *expr, Frame *frame){
     if(!isNull(cdr(expr)) && !isNull(cdr(cdr(expr)))){
         Value *cond = eval(car(cdr(expr)), frame);
         if(cond->type == BOOL_TYPE){
-            if(strcmp(eval(car(cdr(expr)), frame)->s, "#t") != 0){
+            if(strcmp(cond->s, "#t") != 0){
                 if(!isNull(cdr(cdr(cdr(expr))))){
                     return eval(car(cdr(cdr(cdr(expr)))), frame);
                 } else{
