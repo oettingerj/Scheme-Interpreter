@@ -117,9 +117,10 @@
   (lambda args
     args))
 
-(define list?
-  (lambda (lst)))
-    
+;;finish this function
+;(define list?
+;  (lambda (lst)))
+
 
 (define length
   (lambda (lst)

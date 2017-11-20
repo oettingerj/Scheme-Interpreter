@@ -574,6 +574,7 @@ void interpret(Value *tree){
     Frame *parent = talloc(sizeof(Frame));
     parent->bindings = makeNull();
     parent->hasParent = 0;
+
     bind("+", primitiveAdd, parent);
     bind("null?", primitiveIsNull, parent);
     bind("car", primitiveCar, parent);
@@ -586,9 +587,26 @@ void interpret(Value *tree){
     bind("eq?", primitiveEq, parent);
     bind("pair?", primitivePair, parent);
     bind("truncate", primitiveTrunc, parent);
+
+    //Load math and list library functions
+    load("math.scm", parent);
+    load("list.scm", parent);
+
     while(!isNull(tree)){
         Value *cur = car(tree);
         Value *result = eval(cur, parent);
+        printValue(result);
+        if(result->type != VOID_TYPE){
+            printf("\n");
+        }
+        tree = cdr(tree);
+    }
+}
+
+void interpretInFrame(Value *tree, Frame *frame){
+    while(!isNull(tree)){
+        Value *cur = car(tree);
+        Value *result = eval(cur, frame);
         printValue(result);
         if(result->type != VOID_TYPE){
             printf("\n");
@@ -880,6 +898,7 @@ Value *eval_lambda(Value *expr, Frame *frame){
         return closure;
     }
     printf("Incorrect number of args in 'lambda'\n");
+    printValue(expr);
     texit(1);
     return makeNull();
 }
@@ -1021,7 +1040,7 @@ Value *eval_begin(Value *expr, Frame *frame){
     return makeNull();
 }
 
-Value *eval_load(Value *expr){
+Value *eval_load(Value *expr, Frame *frame){
     if(length(expr) == 2 && !isNull(car(cdr(expr)))){
         Value *filename = car(cdr(expr));
         if(filename->type == STR_TYPE){
@@ -1031,7 +1050,7 @@ Value *eval_load(Value *expr){
             freopen(file, "r", stdin);
             Value *tokens = tokenize();
             Value *tree = parse(tokens);
-            interpret(tree);
+            interpretInFrame(tree, frame);
         } else{
             printf("Error: argument to 'load' must be a string\n");
             texit(1);
@@ -1045,8 +1064,14 @@ Value *eval_load(Value *expr){
     return val;
 }
 
+void load(char *str, Frame *frame){
+    freopen(str, "r", stdin);
+    Value *tokens = tokenize();
+    Value *tree = parse(tokens);
+    interpretInFrame(tree, frame);
+}
+
 //Evaluates an expression
-//TODO: Figure out how to make lists evaluate to lists but have (+) not print as (0)
 Value *eval(Value *expr, Frame *frame){
     if(expr->type == INT_TYPE || expr->type == DOUBLE_TYPE ||
        expr->type == STR_TYPE || expr->type == BOOL_TYPE ||
@@ -1098,7 +1123,7 @@ Value *eval(Value *expr, Frame *frame){
                 return eval_begin(expr, frame);
             }
             if(strcmp(car(expr)->s, "load") == 0){
-                return eval_load(expr);
+                return eval_load(expr, frame);
             }
             Value *values = eval_combination(expr, frame);
             return apply(car(values), cdr(values));
