@@ -324,13 +324,6 @@ Value *primitiveMult(Value *args){
 }
 
 Value *primitiveSub(Value *args){
-<<<<<<< HEAD
-    if(length(args) != 2){
-        printf("Subtraction takes exactly two arguments\n");
-        texit(1);
-    }
-=======
->>>>>>> load
     if(args->type == NULL_TYPE){
         Value *ret = talloc(sizeof(Value));
         ret->type = INT_TYPE;
@@ -518,10 +511,7 @@ void interpret(Value *tree){
     bind("<=", primitiveLeq, parent);
     bind("eq?", primitiveEq, parent);
     bind("pair?", primitivePair, parent);
-<<<<<<< HEAD
-=======
     bind("truncate", primitiveTrunc, parent);
->>>>>>> load
     while(!isNull(tree)){
         Value *cur = car(tree);
         Value *result = eval(cur, parent);
@@ -957,7 +947,6 @@ Value *eval_begin(Value *expr, Frame *frame){
     return makeNull();
 }
 
-<<<<<<< HEAD
 Value *eval_load(Value *expr){
     if(length(expr) == 2 && !isNull(car(cdr(expr)))){
         Value *filename = car(cdr(expr));
@@ -976,36 +965,6 @@ Value *eval_load(Value *expr){
     } else{
         printf("Error: incorrect number of args in 'load'\n");
         texit(1);
-=======
-/*read in external file, and execute it as if it
- was directly part of the input*/
-Value *eval_load(Value *args, Frame *frame){
-    if(length(args) != 1){
-        printf("load takes exactly one argument\n");
-        texit(1);
-    }
-    else{
-        if (car(args)->type !=  STR_TYPE){
-            printf("invalid argument type");
-            texit(1);
-        }
-        else{
-            char* filename = car(args)->s;
-            freopen("math.scm", "r", stdin);
-            Value *tokens = tokenize();
-            freopen("/dev/stdin", "r", stdin);
-            Value *tree = parse(tokens);
-            while(!isNull(tree)){
-                Value *cur = car(tree);
-                Value *result = eval(cur, frame);
-                printValue(result);
-                if(result->type != VOID_TYPE){
-                    printf("\n");
-                }
-                tree = cdr(tree);
-            }
-        }
->>>>>>> load
     }
     Value *val = talloc(sizeof(Value));
     val->type = VOID_TYPE;
@@ -1065,11 +1024,7 @@ Value *eval(Value *expr, Frame *frame){
                 return eval_begin(expr, frame);
             }
             if(strcmp(car(expr)->s, "load") == 0){
-<<<<<<< HEAD
                 return eval_load(expr);
-=======
-                return eval_load(cdr(expr), frame);
->>>>>>> load
             }
             Value *values = eval_combination(expr, frame);
             return apply(car(values), cdr(values));
