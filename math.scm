@@ -22,7 +22,6 @@
             #t)
         #f)))
 
-
 (define zero?
   (lambda (x)
     (if (= x 0)
@@ -43,7 +42,9 @@
 
 (define even?
   (lambda (x)
-    (if x)))
+    (if (zero? (modulo x 2))
+        #t
+        #f)))
 
 (define odd?
   (lambda (x)
@@ -83,25 +84,25 @@
 
 (define lcm
   (lambda (x y)
-    ))
+    x))
 
 (define modulo
   (lambda (x m)
-    ))
+    (if (positive? x)
+        (- x (* (truncate (/ x m)) m))
+        (* (truncate (/ x m)) (+ 1 m)))))
 
 (define floor
   (lambda (x)
     (if (negative? x)
-        )))
+        (+ 1 (truncate x))
+        (truncate x))))
 
 (define ceiling
   (lambda (x)
     (if (positive? x)
-        )))
-
-(define truncate
-  (lambda (x)
-    ))
+        (+ 1 (truncate x))
+        (truncate x))))
 
 (define round
   (lambda (x)

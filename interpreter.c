@@ -471,6 +471,27 @@ Value *primitiveCons(Value *args){
     return cons(makeNull(), makeNull());
 }
 
+/*truncate*/
+Value *primitiveTrunc(Value *args){
+    if(length(args) != 1){
+        printf("truncate takes exactly one arguement\n");
+        texit(1);
+    }
+    else{
+        if(car(args)->type != INT_TYPE && car(args)->type != DOUBLE_TYPE){
+            printf("Error: truncate takes a number\n");
+        }
+        if(car(args)->type == INT_TYPE){
+            return car(args);
+        }
+        else{
+            car(args)->d = ((int) car(args)->d);
+            return car(args);
+        }
+    }
+    return makeNull();
+}
+
 
 //Takes a list of s-expressions, calls eval on them, and prints results
 void interpret(Value *tree){
@@ -488,6 +509,7 @@ void interpret(Value *tree){
     bind("<=", primitiveLeq, parent);
     bind("eq?", primitiveEq, parent);
     bind("pair?", primitivePair, parent);
+    bind("truncate", primitiveTrunc, parent);
     while(!isNull(tree)){
         Value *cur = car(tree);
         Value *result = eval(cur, parent);
@@ -937,7 +959,7 @@ Value *eval_load(Value *args, Frame *frame){
         }
         else{
             char* filename = car(args)->s;
-            freopen(filename, "r", stdin);
+            freopen("math.scm", "r", stdin);
             Value *tokens = tokenize();
             freopen("/dev/stdin", "r", stdin);
             Value *tree = parse(tokens);
@@ -950,7 +972,6 @@ Value *eval_load(Value *args, Frame *frame){
                 }
                 tree = cdr(tree);
             }
-		printValue(frame->bindings);
         }
     }
     Value *val = talloc(sizeof(Value));
