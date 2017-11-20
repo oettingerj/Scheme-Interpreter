@@ -5,6 +5,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <ctype.h>
 #include <stdbool.h>
 #include "value.h"
 #include "linkedlist.h"
@@ -78,6 +79,152 @@ void bind(char *name, Value *(*function)(Value *), Frame *frame){
     variable->s = name;
     Value *bound = cons(variable, cons(value, makeNull()));
     frame->bindings = cons(bound, frame->bindings);
+}
+
+Value * lowerCaseWord(Value *a){
+    for (int i = 0; i < strlen(a->s); i++){
+        a->s[i] = tolower(a->s[i]);
+    }
+    return a;
+}
+/*quote problems with comb of num and . eg (pair? (quote 3 . 3))*/ 
+Value * primitivePair(Value *args){
+    Value *ret = talloc(sizeof(Value));
+    printValue(car(args));
+    printf("%d", length(args));
+    ret->type = BOOL_TYPE;
+    if((car(args))->type == CONS_TYPE){
+        ret->s = "#t";
+    }
+    else {
+        ret->s = "#f";
+    }
+    return ret;
+}
+/*comparison b/w strings not working*/
+Value * primitiveEq(Value *args){
+    if(length(args) != 2){
+        printf("Substraction takes exactly two arguments\n");
+        texit(1);
+    }
+    if(args->type == CONS_TYPE){
+        Value *val = car(args);
+        Value *ret = car(cdr(args));
+        if(val->type == INT_TYPE){
+            if(ret->type == INT_TYPE){
+                ret->type = BOOL_TYPE;
+                if (val->i == ret->i){
+                    ret->s = "#t";
+                }
+                else{
+                    ret->s = "#f";
+                }
+            }
+            else {
+                ret->type = BOOL_TYPE;
+                ret->s = "#t";
+                }
+        }
+        else if(val->type == DOUBLE_TYPE){
+            if(ret->type == DOUBLE_TYPE){
+                ret->type = BOOL_TYPE;
+                    ret->s = "#t";
+            }
+            else{
+                ret->type = BOOL_TYPE;
+                ret->s = "#f";
+            }
+        }
+        else if(val->type == SYMBOL_TYPE){
+            if(ret->type == SYMBOL_TYPE){
+                ret->type = BOOL_TYPE;
+                if (strlen(val->s) != strlen(ret->s)){
+                    ret->s = "#f";
+                }
+                else if (strcmp(lowerCaseWord(val)->s,lowerCaseWord(ret)->s) == 0){
+                    ret->s = "#t";
+                }
+                else{
+                    ret->s = "#f";
+                }
+            }
+            else{
+                ret->type = BOOL_TYPE;
+                ret->s = "#f";
+            }
+        }
+        else{
+            ret->type = BOOL_TYPE;
+            ret->s = "#f";
+        }
+        return ret;
+    }
+    else{
+        printf("Invalid argument type\n");
+        texit(1);
+    }
+    return makeNull();
+}
+
+Value * primitiveLeq(Value *args){
+    if(length(args) != 2){
+        printf("Substraction takes exactly two arguments\n");
+        texit(1);
+    }
+    if(args->type == CONS_TYPE){
+        Value *val = car(args);
+        Value *ret = car(cdr(args));
+        if(val->type == INT_TYPE){
+            if(ret->type == INT_TYPE){
+                ret->type = BOOL_TYPE;
+                if (val->i <= ret->i){
+                    ret->s = "#t";
+                }
+                else{
+                    ret->s = "#f";
+                }
+            }
+            else{
+                ret->type = BOOL_TYPE;
+                if (val->i <= ret->d){
+                    ret->s = "#t";
+                }
+                else{
+                    ret->s = "#f";
+                }
+            }
+        }
+        else if(val->type == DOUBLE_TYPE){
+            if(ret->type == INT_TYPE){
+                ret->type = BOOL_TYPE;
+                if (val->d <= ret->i){
+                    ret->s = "#t";
+                }
+                else{
+                    ret->s = "#f";
+                }
+            }
+            else{
+                ret->type = BOOL_TYPE;
+                if (val->d <= ret->d){
+                    ret->s = "#t";
+                }
+                else{
+                    ret->s = "#f";
+                }
+            }
+        }
+        else{
+            printf("Invalid argument type\n");
+            texit(1);
+        }
+        return ret;
+    }
+    else{
+        printf("Invalid argument type\n");
+        texit(1);
+    }
+    return makeNull();
 }
 /*primitive div function*/
 Value *primitiveDiv(Value *args){
@@ -329,6 +476,9 @@ void interpret(Value *tree){
     bind("*", primitiveMult, parent);
     bind("/", primitiveDiv, parent);
     bind("-", primitiveSub, parent);
+    bind("<=", primitiveLeq, parent);
+    bind("eq?", primitiveEq, parent);
+    bind("pair?", primitivePair, parent);
     while(!isNull(tree)){
         Value *cur = car(tree);
         Value *result = eval(cur, parent);
