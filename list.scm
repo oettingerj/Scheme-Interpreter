@@ -153,7 +153,11 @@
 
 (define assq
   (lambda (m lst)
-    ))
+    (if (null? lst)
+        #f
+        (if (= (caar lst) m)
+            (car lst)
+            (assq m (cdr lst))))))
 
 (define append
   (lambda (lst1 lst2)
