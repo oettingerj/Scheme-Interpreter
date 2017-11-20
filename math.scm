@@ -1,22 +1,27 @@
 (define =
-  (lambda args
-    (eq? args)))
+  (lambda (x y)
+    (eq? x y)))
 
 (define >=
-  (lambda args
-    (<= (reverse args))))
+  (lambda (x y)
+    (<= y x)))
 
 (define <
-  (lambda args
-    (if (and (<= args) (= args))
-        #f
-        #t)))
+  (lambda (x y)
+    (if (<= x y)
+        (if (= x y)
+            #f
+            #t)
+        #f)))
 
 (define >
-  (lambda args
-    (if (and (>= args) (= args))
-        #f
-        #t)))
+  (lambda (x y)
+    (if (>= x y)
+        (if (= x y)
+            #f
+            #t)
+        #f)))
+
 
 (define zero?
   (lambda (x)
@@ -71,10 +76,14 @@
         x)))
 
 (define gcd
-  (lambda arg))
+  (lambda (x y)
+    (if (zero? y)
+        x
+        (gcd y (modulo x y)))))
 
 (define lcm
-  (lambda arg))
+  (lambda (x y)
+    ))
 
 (define modulo
   (lambda (x m)

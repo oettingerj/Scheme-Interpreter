@@ -322,10 +322,6 @@ Value *primitiveMult(Value *args){
 }
 
 Value *primitiveSub(Value *args){
-    if(length(args) != 2){
-        printf("Subtraction takes exactly two arguments\n");
-        texit(1);
-    }
     if(args->type == NULL_TYPE){
         Value *ret = talloc(sizeof(Value));
         ret->type = INT_TYPE;
@@ -356,7 +352,12 @@ Value *primitiveSub(Value *args){
             printf("Invalid argument type\n");
             texit(1);
         }
-        return ret;
+        if(isNull(cdr(cdr(args)))){
+            return ret;
+        }
+        else{
+            return primitiveSub(cons(ret, cdr(cdr(args))));
+        }
     }
     else{
         printf("Invalid argument type\n");
@@ -935,7 +936,7 @@ Value *eval_load(Value *args, Frame *frame){
             texit(1);
         }
         else{
-            char *filename = car(args)->s;
+            char* filename = car(args)->s;
             freopen(filename, "r", stdin);
             Value *tokens = tokenize();
             freopen("/dev/stdin", "r", stdin);
