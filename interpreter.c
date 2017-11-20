@@ -81,17 +81,15 @@ void bind(char *name, Value *(*function)(Value *), Frame *frame){
     frame->bindings = cons(bound, frame->bindings);
 }
 
-Value * lowerCaseWord(Value *a){
+Value *lowerCaseWord(Value *a){
     for (int i = 0; i < strlen(a->s); i++){
         a->s[i] = tolower(a->s[i]);
     }
     return a;
 }
-/*quote problems with comb of num and . eg (pair? (quote 3 . 3))*/ 
-Value * primitivePair(Value *args){
+/*quote problems with comb of num and . eg (pair? (quote 3 . 3))*/
+Value *primitivePair(Value *args){
     Value *ret = talloc(sizeof(Value));
-    printValue(car(args));
-    printf("%d", length(args));
     ret->type = BOOL_TYPE;
     if((car(args))->type == CONS_TYPE){
         ret->s = "#t";
@@ -102,9 +100,9 @@ Value * primitivePair(Value *args){
     return ret;
 }
 /*comparison b/w strings not working*/
-Value * primitiveEq(Value *args){
+Value *primitiveEq(Value *args){
     if(length(args) != 2){
-        printf("Substraction takes exactly two arguments\n");
+        printf("= takes exactly two arguments\n");
         texit(1);
     }
     if(args->type == CONS_TYPE){
@@ -166,9 +164,9 @@ Value * primitiveEq(Value *args){
     return makeNull();
 }
 
-Value * primitiveLeq(Value *args){
+Value *primitiveLeq(Value *args){
     if(length(args) != 2){
-        printf("Substraction takes exactly two arguments\n");
+        printf("<= takes exactly two arguments\n");
         texit(1);
     }
     if(args->type == CONS_TYPE){
@@ -281,7 +279,7 @@ Value *primitiveDiv(Value *args){
     return makeNull();
 }
 /*primitive multpilication function*/
-Value * primitiveMult(Value *args){
+Value *primitiveMult(Value *args){
     if(args->type == NULL_TYPE){
         Value *ret = talloc(sizeof(Value));
         ret->type = INT_TYPE;
@@ -321,9 +319,9 @@ Value * primitiveMult(Value *args){
     return makeNull();
 }
 
-Value * primitiveSub(Value *args){
+Value *primitiveSub(Value *args){
     if(length(args) != 2){
-        printf("Substraction takes exactly two arguments\n");
+        printf("Subtraction takes exactly two arguments\n");
         texit(1);
     }
     if(args->type == NULL_TYPE){
@@ -367,7 +365,7 @@ Value * primitiveSub(Value *args){
 
 /*Add
  For right now, everything's a float*/
-Value * primitiveAdd(Value *args){
+Value *primitiveAdd(Value *args){
     if(args->type == NULL_TYPE){
         Value *ret = talloc(sizeof(Value));
         ret->type = INT_TYPE;
