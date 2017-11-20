@@ -10,6 +10,8 @@
 #include "linkedlist.h"
 #include "talloc.h"
 #include "interpreter.h"
+#include "tokenizer.h"
+#include "parser.h"
 
 
 //Prints a Value
@@ -315,7 +317,6 @@ Value *primitiveCons(Value *args){
     return cons(makeNull(), makeNull());
 }
 
-
 //Takes a list of s-expressions, calls eval on them, and prints results
 void interpret(Value *tree){
     Frame *parent = talloc(sizeof(Frame));
@@ -513,6 +514,40 @@ Value *eval_lambda(Value *expr, Frame *frame){
     return makeNull();
 }
 
+/*read in external file, and execute it as if it
+ was directly part of the input*/
+Value *eval_load(Value *args, Frame *frame){
+    if(length(args) != 1){
+        printf("load takes exactly one argument\n");
+        texit(1);
+    }
+    else{
+        if (car(args)->type !=  STR_TYPE){
+            printf("invalid argument type");
+            texit(1);
+        }
+        else{
+            char *filename = car(args)->s;
+            freopen("test.eval.input.11", "r", stdin);
+            Value *tokens = tokenize();
+            freopen("/dev/stdin", "r", stdin);
+            Value *tree = parse(tokens);
+            while(!isNull(tree)){
+                Value *cur = car(tree);
+                Value *result = eval(cur, frame);
+                printValue(result);
+                if(result->type != VOID_TYPE){
+                    printf("\n");
+                }
+                tree = cdr(tree);
+            }
+        }
+    }
+    Value *val = talloc(sizeof(Value));
+    val->type = VOID_TYPE;
+    return val;
+}
+
 //Evaluates an expression
 Value *eval(Value *expr, Frame *frame){
     if(expr->type == INT_TYPE || expr->type == DOUBLE_TYPE ||
@@ -539,6 +574,9 @@ Value *eval(Value *expr, Frame *frame){
             }
             if(strcmp(car(expr)->s, "lambda") == 0){
                 return eval_lambda(expr, frame);
+            }
+            if(strcmp(car(expr)->s, "load") == 0){
+                return eval_load(cdr(expr), frame);
             }
             Value *values = eval_combination(expr, frame);
             return apply(car(values), cdr(values));

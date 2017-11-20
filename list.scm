@@ -113,18 +113,48 @@
 
 ;;Now the actually interesting stuff
 
-(define list
-  (lambda args
-	args)
-
-(define list?
-  (lambda (lst)
-
-
-(define length
-  (lambda (lst)
-    (if (null? lst)
-      0
-      (+ (length (cdr lst)) 1))))
-
-(
+;(define list
+;  (lambda args
+;    args))
+;
+;(define list?
+;  (lambda (lst)))
+;    
+;
+;(define length
+;  (lambda (lst)
+;    (if (null? lst)
+;        0
+;        (+ (length (cdr lst)) 1))))
+;
+;(define reverse
+;  (lambda (lst)
+;    (if (<= (length lst) 1)
+;        lst
+;        (cons (reverse (cdr lst)) (car lst)))))
+;
+;(define map
+;  (lambda (f lst)
+;    (if (null? lst)
+;        lst
+;        (cons (f (car lst)) (map f (cdr lst))))))
+;
+;(define filter
+;  (lambda (f lst)
+;    (if (null? lst)
+;        lst
+;        (if (f (car lst))
+;            (cons #t (filter f (cdr lst)))
+;            (filter f (cdr lst))))))
+;
+;(define foldl
+;  (lambda (f i lst)
+;    (if (null? lst)
+;        i
+;        (foldl f (f i (car lst)) (cdr lst)))))
+;
+;(define foldr
+;  (lambda (f i lst)
+;    (if (null? lst)
+;        i
+;        (f (car lst) (foldr f (f z (cdr lst)))))))
