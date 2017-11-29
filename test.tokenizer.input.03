@@ -1,5 +1,0 @@
-(define !x2 "checking inverted' ")
-(if #t 
-	(+ x y) 
-	(+ 1 3))
-	(lambda ())

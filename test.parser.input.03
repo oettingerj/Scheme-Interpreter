@@ -1,4 +1,0 @@
-(define x 3); checking string
-(lambda ()
-	(+ x 3))
-(cons (quote ("hello world") x))

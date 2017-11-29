@@ -1,2 +1,0 @@
-(let ((x1 (quote (a b (quote (c d e "string"))))))
-	(if #t x1 "sting"))
