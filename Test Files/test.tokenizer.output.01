@@ -1,0 +1,26 @@
+(:open
++:symbol
+59:integer
+(:open
+quote:symbol
+(:open
+"hello world":string
+(:open
+1:integer
+2:integer
+3:integer
+4:integer
+):close
+):close
+(:open
+-:symbol
+$alphanum:symbol
+a8+9:symbol
+):close
+(:open
+if:symbol
+#f:boolean
+2:integer
+3:integer
+):close
+):close
