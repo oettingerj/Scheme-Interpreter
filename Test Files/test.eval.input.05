@@ -1,9 +1,0 @@
-(define return
-  (lambda (x)
-	x))
-(return 10)
-(define return
-  (lambda (x)
-	23))
-(return 10)
-

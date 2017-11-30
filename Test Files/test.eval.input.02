@@ -1,5 +1,0 @@
-(let ((abc "string")
-      (bac (quote abc))
-      (zzz #f))
-  (if zzz abc bac))
-(quote (hello this is a test))

@@ -1,8 +1,0 @@
-(+ 59 (quote ("hello world" ;welcome to the jungle
-		(1 2 3 4))
-	;hello!
-	;many comments in a row
-	(- $alphanum a8+9)
-	(if #f
-	    2
-	    3))

@@ -1,8 +1,0 @@
-(define partial
-	(lambda (lst)
-		(if (null? (cdr lst))
-			0
-			(cons (+ (car lst) (car(cdr lst))) (partial (cdr lst))))))
-
-(partial (quote (1 2 3 4)))
-(partial (quote (1 1 1 1)))

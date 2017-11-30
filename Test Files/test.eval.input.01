@@ -1,3 +1,0 @@
-(let ((x (quote y))
-      (z 6))
-     x)

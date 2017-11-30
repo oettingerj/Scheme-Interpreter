@@ -1,1 +1,0 @@
-(lambda (llst n) (if (null? llst) #f (if (= n 1) (car llst) (nth ((cdr llst)) (- n 1)))))
