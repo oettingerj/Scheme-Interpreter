@@ -1,0 +1,4 @@
+(if (and (or #f (> +9 9.000))
+         (or #t (< -8 .8)))
+    "hello\nworld\""
+    "Use \\n to make new line characters")

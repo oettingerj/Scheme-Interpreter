@@ -1,0 +1,12 @@
+(define square
+  (lambda ()
+    (quote (x x))))
+
+(square)
+
+(define y 1)
+(define num
+  (lambda (count) (quote (y count))))
+(num 3)
+
+(lambda (count) (quote (y count)))

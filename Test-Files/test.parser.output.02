@@ -1,0 +1,1 @@
+(if (right bst) (if (null-bst? (left bst)) (if (null-bst? (right bst)) #t (bst? (right bst))) (begin (bst? (left bst)) (if (null-bst? (right bst)) #t (bst? (right bst))))) #f)
